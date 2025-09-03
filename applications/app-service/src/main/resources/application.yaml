@@ -41,6 +41,9 @@ logging:
     co.com.pragma: "INFO"
     org.springframework.web: "WARN"
     io.r2dbc: "WARN"
+    org.springframework.cache: DEBUG # <-- Añadido para ver logs de caché
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%15.15t] [%X{correlationId}] %-40.40logger{39} : %m%n"
 adapter:
   user-api:
     timeout: 5000
@@ -66,3 +69,9 @@ resilience4j:
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
+
+# Propiedades de negocio externalizadas
+app:
+  rules:
+    clientRoleId: 2
+    pendingStatusId: 1

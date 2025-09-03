@@ -21,6 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(classes = {UseCasesConfig.class, UseCasesConfigTest.MockDependenciesConfig.class})
 class UseCasesConfigTest {
 
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void applicationUseCaseShouldBeCreated() {
+        // Act: Intentamos obtener el bean del ApplicationUseCase del contexto.
+        ApplicationUseCase useCase = context.getBean(ApplicationUseCase.class);
+
+        // Assert: Si la línea anterior no lanzó una excepción, el bean se creó exitosamente.
+        assertNotNull(useCase, "El bean de ApplicationUseCase no debería ser nulo.");
+    }
+
     @TestConfiguration
     static class MockDependenciesConfig {
         @Bean("loanTypeReactiveGatewayAdapter")
@@ -42,17 +54,5 @@ class UseCasesConfigTest {
         public ApplicationRepository applicationRepository() {
             return Mockito.mock(ApplicationRepository.class);
         }
-    }
-
-    @Autowired
-    private ApplicationContext context;
-
-    @Test
-    void applicationUseCaseShouldBeCreated() {
-        // Act: Intentamos obtener el bean del ApplicationUseCase del contexto.
-        ApplicationUseCase useCase = context.getBean(ApplicationUseCase.class);
-
-        // Assert: Si la línea anterior no lanzó una excepción, el bean se creó exitosamente.
-        assertNotNull(useCase, "El bean de ApplicationUseCase no debería ser nulo.");
     }
 }

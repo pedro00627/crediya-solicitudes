@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,8 +66,8 @@ class ApplicationReactiveRepositoryAdapterTest {
         // Assert: Verificar que el resultado es el esperado
         StepVerifier.create(result)
                 .assertNext(savedApp -> {
-                    assertEquals(applicationModel.id(), savedApp.id());
-                    assertEquals(applicationModel.email(), savedApp.email());
+                    assertEquals(applicationModel.getApplicationId(), savedApp.getApplicationId());
+                    assertEquals(applicationModel.getEmail(), savedApp.getEmail());
                 })
                 .verifyComplete();
     }

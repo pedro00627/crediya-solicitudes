@@ -23,9 +23,9 @@ public class StatusMapper {
             return null;
         }
         return new StatusEntity(
-                domain.statusId(),
-                domain.name(),
-                domain.description()
+                domain.getStatusId(),
+                domain.getName(),
+                domain.getDescription()
         );
     }
 }

@@ -1,7 +1,6 @@
 package co.com.pragma.consumer;
 
 
-import co.com.pragma.model.user.UserRecord;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -56,7 +55,7 @@ class RestConsumerTest {
 
         // Assert: Verificamos que la respuesta es la esperada
         StepVerifier.create(response)
-                .expectNextMatches(user -> user.email().equals(email) && user.roleId().equals(2))
+                .expectNextMatches(user -> user.getEmail().equals(email) && user.getRoleId().equals(2))
                 .verifyComplete();
     }
 }

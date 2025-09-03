@@ -51,24 +51,6 @@ class RouterRestTest {
     @Autowired
     private Validator validator;
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public ApplicationUseCase applicationUseCase() {
-            return Mockito.mock(ApplicationUseCase.class);
-        }
-
-        @Bean
-        public IApplicationMapper iApplicationMapper() {
-            return Mockito.mock(IApplicationMapper.class);
-        }
-
-        @Bean
-        public Validator validator() {
-            return Mockito.mock(Validator.class);
-        }
-    }
-
     @Test
     void shouldCreateLoanApplicationSuccessfully() {
         // Arrange
@@ -106,5 +88,23 @@ class RouterRestTest {
                 .bodyValue(requestRecord)
                 .exchange()
                 .expectStatus().isCreated();
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ApplicationUseCase applicationUseCase() {
+            return Mockito.mock(ApplicationUseCase.class);
+        }
+
+        @Bean
+        public IApplicationMapper iApplicationMapper() {
+            return Mockito.mock(IApplicationMapper.class);
+        }
+
+        @Bean
+        public Validator validator() {
+            return Mockito.mock(Validator.class);
+        }
     }
 }

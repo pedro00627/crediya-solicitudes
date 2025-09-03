@@ -20,24 +20,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @Import({CorsConfig.class, SecurityHeadersConfig.class, ConfigTest.MockDependenciesConfig.class})
 class ConfigTest {
 
-    @TestConfiguration
-    static class MockDependenciesConfig {
-        @Bean
-        public IApplicationMapper iApplicationMapper() {
-            return Mockito.mock(IApplicationMapper.class);
-        }
-
-        @Bean
-        public ApplicationUseCase applicationUseCase() {
-            return Mockito.mock(ApplicationUseCase.class);
-        }
-
-        @Bean
-        public Validator validator() {
-            return Mockito.mock(Validator.class);
-        }
-    }
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -55,6 +37,24 @@ class ConfigTest {
                 .expectHeader().valueEquals("Cache-Control", "no-store")
                 .expectHeader().valueEquals("Pragma", "no-cache")
                 .expectHeader().valueEquals("Referrer-Policy", "strict-origin-when-cross-origin");
+    }
+
+    @TestConfiguration
+    static class MockDependenciesConfig {
+        @Bean
+        public IApplicationMapper iApplicationMapper() {
+            return Mockito.mock(IApplicationMapper.class);
+        }
+
+        @Bean
+        public ApplicationUseCase applicationUseCase() {
+            return Mockito.mock(ApplicationUseCase.class);
+        }
+
+        @Bean
+        public Validator validator() {
+            return Mockito.mock(Validator.class);
+        }
     }
 
 }

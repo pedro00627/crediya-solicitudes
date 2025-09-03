@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
-@Repository // Usamos @Repository para ser consistentes con ApplicationReactiveRepositoryAdapter
+@Repository
 @RequiredArgsConstructor
 public class StatusRepositoryAdapter implements StatusGateway {
 
@@ -21,8 +21,7 @@ public class StatusRepositoryAdapter implements StatusGateway {
 
     @Override
     public Mono<Status> findById(Integer id) {
-        // Envolvemos la llamada al método cacheado en un flujo reactivo
-        // que se ejecuta en un hilo separado para no bloquear el event-loop.
+
         return Mono.fromCallable(() -> findByIdAndCache(id))
                 .subscribeOn(Schedulers.boundedElastic())
                 // Si el método devuelve null (no encontrado), lo convertimos en un Mono vacío.
@@ -35,12 +34,10 @@ public class StatusRepositoryAdapter implements StatusGateway {
      */
     @Cacheable(value = "statuses", key = "#id")
     public Status findByIdAndCache(Integer id) {
-        // Este log es la prueba clave: SOLO se imprimirá la primera vez que se llame
-        // con un ID específico. Las siguientes veces, el resultado vendrá de la caché.
         log.info("==> CACHE MISS. Consultando ESTADO desde la BD con ID: {}", id);
 
         return repository.findById(id)
-                .map(statusMapper::toDomain) // Mapeamos la entidad de BD al modelo de dominio
-                .block(); // Obtenemos el resultado de forma síncrona para la caché.
+                .map(statusMapper::toDomain)
+                .block();
     }
 }

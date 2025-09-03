@@ -26,12 +26,12 @@ public class LoanTypeMapper {
             return null;
         }
         return new LoanTypeEntity(
-                domain.loanTypeId(),
-                domain.name(),
-                domain.minAmount(),
-                domain.maxAmount(),
-                domain.interestRate(),
-                domain.autoValidation()
+                domain.getLoanTypeId(),
+                domain.getName(),
+                domain.getMinAmount(),
+                domain.getMaxAmount(),
+                domain.getInterestRate(),
+                domain.isAutoValidation()
         );
     }
 }

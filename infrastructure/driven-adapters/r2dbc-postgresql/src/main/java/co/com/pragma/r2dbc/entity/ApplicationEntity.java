@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("solicitud")
+@Table(name = "solicitud", schema = "solicitudes")
 public class ApplicationEntity {
     @Id
     @Column("id_solicitud")
