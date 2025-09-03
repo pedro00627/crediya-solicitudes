@@ -11,10 +11,10 @@ import java.lang.reflect.ParameterizedType;
 import java.util.function.Function;
 
 public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudRepository<D, I> & ReactiveQueryByExampleExecutor<D>> {
-    protected R repository;
-    protected ObjectMapper mapper;
     private final Class<D> dataClass;
     private final Function<D, E> toEntityFn;
+    protected R repository;
+    protected ObjectMapper mapper;
 
     @SuppressWarnings("unchecked")
     protected ReactiveAdapterOperations(R repository, ObjectMapper mapper, Function<D, E> toEntityFn) {

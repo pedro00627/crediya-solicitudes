@@ -1,44 +1,58 @@
 package co.com.pragma.config;
 
+import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
+import co.com.pragma.model.status.gateways.StatusGateway;
+import co.com.pragma.model.user.gateways.UserGateway;
+import co.com.pragma.usecase.application.ApplicationUseCase;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public class UseCasesConfigTest {
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    @Test
-    void testUseCaseBeansExist() {
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class)) {
-            String[] beanNames = context.getBeanDefinitionNames();
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {UseCasesConfig.class, UseCasesConfigTest.MockDependenciesConfig.class})
+class UseCasesConfigTest {
 
-            boolean useCaseBeanFound = false;
-            for (String beanName : beanNames) {
-                if (beanName.endsWith("UseCase")) {
-                    useCaseBeanFound = true;
-                    break;
-                }
-            }
-
-            assertTrue(useCaseBeanFound, "No beans ending with 'Use Case' were found");
+    @TestConfiguration
+    static class MockDependenciesConfig {
+        @Bean("loanTypeReactiveGatewayAdapter")
+        public LoanTypeGateway loanTypeGateway() {
+            return Mockito.mock(LoanTypeGateway.class);
         }
-    }
 
-    @Configuration
-    @Import(UseCasesConfig.class)
-    static class TestConfig {
+        @Bean("statusReactiveGatewayAdapter")
+        public StatusGateway statusGateway() {
+            return Mockito.mock(StatusGateway.class);
+        }
 
         @Bean
-        public MyUseCase myUseCase() {
-            return new MyUseCase();
+        public UserGateway userGateway() {
+            return Mockito.mock(UserGateway.class);
+        }
+
+        @Bean
+        public ApplicationRepository applicationRepository() {
+            return Mockito.mock(ApplicationRepository.class);
         }
     }
 
-    static class MyUseCase {
-        public String execute() {
-            return "MyUseCase Test";
-        }
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    void applicationUseCaseShouldBeCreated() {
+        // Act: Intentamos obtener el bean del ApplicationUseCase del contexto.
+        ApplicationUseCase useCase = context.getBean(ApplicationUseCase.class);
+
+        // Assert: Si la línea anterior no lanzó una excepción, el bean se creó exitosamente.
+        assertNotNull(useCase, "El bean de ApplicationUseCase no debería ser nulo.");
     }
 }
