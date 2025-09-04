@@ -12,12 +12,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.util.context.ContextView;
 
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class Handler {
+
+    private static final Logger log = LoggerFactory.getLogger(Handler.class);
+
     private final IApplicationMapper mapper;
     private final ApplicationUseCase useCase;
     private final Validator validator;

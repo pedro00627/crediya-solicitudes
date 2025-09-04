@@ -43,7 +43,10 @@ logging:
     io.r2dbc: "WARN"
     org.springframework.cache: DEBUG # <-- Añadido para ver logs de caché
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%15.15t] [%X{correlationId}] %-40.40logger{39} : %m%n"
+    # Se añade el ID de correlación (%X{correlationId}) al patrón de logs.
+    # El ID aparecerá entre corchetes después del nivel de log.
+    # Se añade %ex para mostrar el stack trace completo de las excepciones.
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%15.15t] [%X{correlationId}] %-40.40logger{39} : %m%n%ex"
 adapter:
   user-api:
     timeout: 5000

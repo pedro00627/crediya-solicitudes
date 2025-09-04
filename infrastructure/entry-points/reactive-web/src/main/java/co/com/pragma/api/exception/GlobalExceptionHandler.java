@@ -32,6 +32,9 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
                 .orElseThrow(() -> new IllegalStateException("No se encontró un manejador de excepciones por defecto."))
                 .handle(ex, exchange)
                 .flatMap(errorWrapper -> {
+                    // Log the error body to the console
+                    log.error("Error Response Body: {}", errorWrapper.body());
+
                     exchange.getResponse().setStatusCode(errorWrapper.status());
                     exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
                     try {
