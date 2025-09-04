@@ -11,8 +11,12 @@ import co.com.pragma.model.status.gateways.StatusGateway;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.model.user.gateways.UserGateway;
 import co.com.pragma.usecase.validator.ApplicationValidator;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class ApplicationUseCase {
@@ -28,10 +32,16 @@ public class ApplicationUseCase {
     private final Integer pendingStatusId;
 
     /**
-     * Record interno para agrupar los datos necesarios para la validación.
-     * Esto evita manejar Tuplas directamente y hace el código más legible.
+     * Clase interna para agrupar los datos necesarios para la validación.
+     * Reemplaza el record para ser consistente con el uso de getters.
      */
-    private record ValidationData(LoanType loanType, UserRecord user, Status initialStatus) {}
+    @Getter
+    @AllArgsConstructor
+    private static class ValidationData {
+        private final LoanType loanType;
+        private final UserRecord user;
+        private final Status initialStatus;
+    }
 
     /**
      * Orquesta el proceso de creación de una nueva solicitud de préstamo.
@@ -68,8 +78,8 @@ public class ApplicationUseCase {
     private Mono<ValidationData> validateBusinessRules(Application applicationRequest, ValidationData data) {
         return Mono.fromRunnable(() -> {
             // Se usa el campo inyectado para el ID del rol de cliente
-            ApplicationValidator.validateUserRole(data.user(), clientRoleId);
-            ApplicationValidator.validateLoanAmount(applicationRequest, data.loanType());
+            ApplicationValidator.validateUserRole(data.getUser(), clientRoleId);
+            ApplicationValidator.validateLoanAmount(applicationRequest, data.getLoanType());
         }).thenReturn(data);
     }
 
@@ -78,20 +88,20 @@ public class ApplicationUseCase {
      */
     private Mono<ApplicationCreationResult> saveApplicationAndBuildResult(Application applicationRequest, ValidationData data) {
         Application applicationToSave = new Application(
-                null, // Dejar que la BD genere el UUID
+                UUID.randomUUID(), // El ID se genera en la capa de aplicación.
                 applicationRequest.getAmount(),
                 applicationRequest.getTerm(),
                 applicationRequest.getEmail(),
-                data.initialStatus().getStatusId(),
-                data.loanType().getLoanTypeId()
+                data.getInitialStatus().getStatusId(),
+                data.getLoanType().getLoanTypeId()
         );
 
         return applicationRepository.save(applicationToSave)
                 .map(savedApplication -> new ApplicationCreationResult(
                         savedApplication,
-                        data.loanType(),
-                        data.initialStatus(),
-                        data.user()
+                        data.getLoanType(),
+                        data.getInitialStatus(),
+                        data.getUser()
                 ));
     }
 }

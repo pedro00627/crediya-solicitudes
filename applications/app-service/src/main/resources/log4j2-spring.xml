@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Appenders>
+        <!-- Console Appender con formato JSON estructurado -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <JsonTemplateLayout eventTemplateUri="classpath:log4j2-template.json"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Log para nuestro código de aplicación. Nivel INFO para ver el flujo de negocio. -->
+        <Logger name="co.com.pragma" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Log para la caché de Spring. Nivel WARN para reducir el ruido. -->
+        <!-- El log de "CACHE MISS" se seguirá viendo porque está en nuestro paquete. -->
+        <Logger name="org.springframework.cache" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Reducimos el ruido del framework de Spring y de la base de datos. -->
+        <Logger name="org.springframework" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="io.r2dbc" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Root Logger: Captura todo lo demás con un nivel por defecto 'warn' -->
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

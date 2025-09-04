@@ -1,7 +1,7 @@
 apply plugin: 'org.springframework.boot'
 
 configurations {
-    all {
+    configureEach {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 }
@@ -21,7 +21,13 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation "org.reactivecommons.utils:object-mapper:${reactiveCommonsMapperVersion}"
 
-    // CORREGIDO: Se cambia a 'implementation' para que esté disponible en el código principal
+    // Micrometer Tracing dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
+    // Context Propagation for Reactive Tracing
+    implementation 'io.micrometer:context-propagation:1.0.6'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     runtimeOnly('org.springframework.boot:spring-boot-devtools')

@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Order(-2) // Se asegura de que se ejecute antes que el manejador de errores por defecto de Spring
+@Order(-2) // Alta prioridad para interceptar errores antes que los manejadores por defecto de Spring
 @RequiredArgsConstructor
 public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
@@ -25,24 +25,39 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        // Encuentra la primera estrategia que soporta el tipo de excepción
-        return strategies.stream()
+        // Encuentra la primera estrategia que soporta este tipo de excepción
+        return this.strategies.stream()
                 .filter(strategy -> strategy.supports(ex.getClass()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No se encontró un manejador de excepciones por defecto."))
-                .handle(ex, exchange)
+                .orElseThrow(() -> new IllegalStateException("No se encontró una estrategia de manejo de excepciones por defecto."))
+                .handle(ex, exchange) // Delega el manejo a la estrategia encontrada
                 .flatMap(errorWrapper -> {
-                    // Log the error body to the console
-                    log.error("Error Response Body: {}", errorWrapper.body());
+                    // Loguea el error de forma centralizada y estructurada
+                    if (errorWrapper.status().is5xxServerError()) {
+                        log.error("Error no controlado en la petición [{} {}]: {}",
+                                exchange.getRequest().getMethod(),
+                                exchange.getRequest().getPath(),
+                                errorWrapper.body(), // Loguea el cuerpo del error
+                                ex); // Loguea el stack trace completo para errores del servidor
+                    } else {
+                        log.warn("Error de negocio o de cliente en la petición [{} {}]: {}",
+                                exchange.getRequest().getMethod(),
+                                exchange.getRequest().getPath(),
+                                errorWrapper.body()); // Para errores 4xx, el cuerpo del error suele ser suficiente
+                    }
 
+                    // Establece el código de estado y el tipo de contenido en la respuesta HTTP
                     exchange.getResponse().setStatusCode(errorWrapper.status());
                     exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+                    // Escribe el cuerpo del error en la respuesta
                     try {
                         byte[] bytes = objectMapper.writeValueAsBytes(errorWrapper.body());
-                        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(bytes)));
+                        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                                .bufferFactory().wrap(bytes)));
                     } catch (JsonProcessingException e) {
-                        log.error("Error escribiendo la respuesta de error en formato JSON", e);
-                        return Mono.error(e);
+                        log.error("Error escribiendo la respuesta JSON de error", e);
+                        return Mono.empty(); // Se retorna Mono.empty() para no propagar un segundo error
                     }
                 });
     }
