@@ -11,6 +11,14 @@ spring:
       path: "/h2"
   profiles:
     include: null
+  cache:
+    type: caffeine
+    cache-names:
+      - statuses
+      - loan_types
+    caffeine:
+      # CORREGIDO: Se ajusta el tiempo de expiración a 1 hora (3600s)
+      spec: maximumSize=500,expireAfterAccess=500s
 management:
   endpoints:
     web:
@@ -66,3 +74,6 @@ app:
   rules:
     clientRoleId: 2
     pendingStatusId: 1
+
+logging:
+  config: classpath:log4j2-spring.xml

@@ -6,7 +6,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -15,6 +14,7 @@ public class RestConsumer implements UserGateway {
     private final WebClient.Builder webClientBuilder;
     private final String apiUrl;
 
+    // Inyectamos el valor de la propiedad directamente en el constructor
     public RestConsumer(WebClient.Builder webClientBuilder, @Value("${adapter.user-api.url}") String apiUrl) {
         this.webClientBuilder = webClientBuilder;
         this.apiUrl = apiUrl;
@@ -27,7 +27,6 @@ public class RestConsumer implements UserGateway {
                 .get()
                 .uri(uriBuilder -> uriBuilder.path("/api/v1/usuarios").queryParam("email", email).build())
                 .retrieve()
-                .bodyToMono(UserRecord.class)
-                .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty()); // Idiomatic translation of 404 to empty
+                .bodyToMono(UserRecord.class);
     }
 }

@@ -38,7 +38,7 @@ public class Handler {
                 })
                 .flatMap(useCase::createLoanApplication)
                 .doOnSuccess(result -> log.info("Proceso de creación de solicitud finalizado exitosamente para el ID: {}",
-                        result.getApplication().getApplicationId()))
+                        result.application().getApplicationId())) // CORREGIDO: Usando el getter correcto
                 .map(mapper::toResponse)
                 .flatMap(response -> ServerResponse.status(HttpStatus.CREATED).bodyValue(response));
     }

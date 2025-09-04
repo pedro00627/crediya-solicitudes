@@ -1,35 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATH">./logs</Property>
+    </Properties>
+
     <Appenders>
-        <!-- Console Appender con formato JSON estructurado -->
+        <!-- Appender para la Consola con formato JSON estructurado -->
         <Console name="Console" target="SYSTEM_OUT">
             <JsonTemplateLayout eventTemplateUri="classpath:log4j2-template.json"/>
         </Console>
+
+        <!-- Appender para Archivo, escribirá en ./logs/log.log -->
+        <File name="File" fileName="${LOG_PATH}/log.log">
+            <JsonTemplateLayout eventTemplateUri="classpath:log4j2-template.json"/>
+        </File>
     </Appenders>
 
     <Loggers>
         <!-- Log para nuestro código de aplicación. Nivel INFO para ver el flujo de negocio. -->
         <Logger name="co.com.pragma" level="info" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Log para la caché de Spring. Nivel WARN para reducir el ruido. -->
-        <!-- El log de "CACHE MISS" se seguirá viendo porque está en nuestro paquete. -->
-        <Logger name="org.springframework.cache" level="warn" additivity="false">
+        <!-- CORREGIDO: Se silencia el logger de consultas SQL para eliminar el ruido. -->
+        <!-- La traza de acceso a BD se ve a través de los logs de "CACHE MISS". -->
+        <Logger name="io.r2dbc.postgresql.QUERY" level="warn" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Reducimos el ruido del framework de Spring y de la base de datos. -->
+        <!-- Reducimos el ruido de los frameworks. -->
         <Logger name="org.springframework" level="warn" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
         <Logger name="io.r2dbc" level="warn" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="io.netty" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="reactor.netty" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="org.hibernate.validator" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="com.zaxxer.hikari" level="warn" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
         <!-- Root Logger: Captura todo lo demás con un nivel por defecto 'warn' -->
         <Root level="warn">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Root>
     </Loggers>
 </Configuration>

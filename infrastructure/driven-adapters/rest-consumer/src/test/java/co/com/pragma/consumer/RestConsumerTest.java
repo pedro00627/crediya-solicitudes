@@ -1,6 +1,8 @@
 package co.com.pragma.consumer;
 
-
+import co.com.pragma.model.user.UserRecord;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -14,22 +16,25 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RestConsumerTest {
 
     public static MockWebServer mockBackEnd;
     private static RestConsumer restConsumer;
+    private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @BeforeAll
     static void setUp() throws IOException {
         mockBackEnd = new MockWebServer();
         mockBackEnd.start();
 
-        // CORREGIDO: Se obtienen todas las dependencias ANTES de crear el objeto.
         String baseUrl = mockBackEnd.url("/").toString();
         WebClient.Builder webClientBuilder = WebClient.builder();
 
-        // CORREGIDO: Se pasan TODAS las dependencias requeridas al constructor.
         restConsumer = new RestConsumer(webClientBuilder, baseUrl);
     }
 
@@ -40,10 +45,22 @@ class RestConsumerTest {
 
     @Test
     @DisplayName("Debe encontrar un usuario por email exitosamente")
-    void shouldFindUserByEmail() {
+    void shouldFindUserByEmail() throws JsonProcessingException {
         // Arrange: Preparamos la respuesta que el servidor mock debe devolver
         String email = "test@pragma.com.co";
-        String jsonResponse = "{\"id\": \"1\", \"firstName\": \"Nombre\", \"lastName\": \"Apellido\", \"birthDate\": \"1990-01-01\", \"email\": \"" + email + "\", \"identityDocument\": \"123456\", \"phone\": \"3001234567\", \"roleId\": 2, \"baseSalary\": 50000.0}";
+        UserRecord mockUser = new UserRecord(
+                "1",
+                "Nombre",
+                "Apellido",
+                LocalDate.of(1990, 1, 1),
+                email,
+                "123456",
+                "3001234567",
+                2,
+                50000.0
+        );
+        // Se crea el JSON a partir del objeto real, haciendo el test más robusto.
+        String jsonResponse = objectMapper.writeValueAsString(mockUser);
 
         mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +72,14 @@ class RestConsumerTest {
 
         // Assert: Verificamos que la respuesta es la esperada
         StepVerifier.create(response)
-                .expectNextMatches(user -> user.getEmail().equals(email) && user.getRoleId().equals(2))
+                .expectNextMatches(user -> {
+                    // MEJORA: Usar aserciones explícitas para mensajes de error más claros.
+                    assertAll(
+                            () -> assertEquals(email, user.getEmail(), "El email no coincide"),
+                            () -> assertEquals(2, user.getRoleId(), "El ID del rol no coincide")
+                    );
+                    return true; // Si las aserciones pasan, la condición se cumple.
+                })
                 .verifyComplete();
     }
 }

@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -30,66 +30,19 @@ import java.util.Collections;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-        WebFluxAutoConfiguration.class,
-        RouterRest.class,
-        Handler.class,
-        RouterRestTest.TestConfig.class
-})
-@AutoConfigureWebTestClient
+@WebFluxTest
+@Import({RouterRest.class, Handler.class, RouterRestTest.TestConfig.class})
 class RouterRestTest {
 
-    @Autowired
-    private WebTestClient webTestClient;
+    // Esta clase vacía actúa como el ancla que Spring Boot necesita para iniciar el contexto de prueba.
+    @SpringBootConfiguration
+    static class TestApplication {}
 
-    @Autowired
-    private ApplicationUseCase useCase;
-
-    @Autowired
-    private IApplicationMapper mapper;
-
-    @Autowired
-    private Validator validator;
-
-    @Test
-    void shouldCreateLoanApplicationSuccessfully() {
-        // Arrange
-        var requestRecord = new ApplicationRequestRecord(
-                UUID.randomUUID(),
-                BigDecimal.TEN,
-                12,
-                "test@test.com",
-                1,
-                1
-        );
-
-        var mockUseCaseResponse = new ApplicationCreationResult(
-                new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1),
-                new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true),
-                new Status(1, "PENDIENTE", "Pendiente de revisión"),
-                new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), "test@test.com", "123456", "3001234567", 2, 50000.0)
-        );
-
-        Mockito.when(validator.validate(Mockito.any(ApplicationRequestRecord.class))).thenReturn(Collections.emptySet());
-
-        Mockito.when(mapper.toModel(Mockito.any(ApplicationRequestRecord.class)))
-                .thenReturn(new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1));
-
-        Mockito.when(useCase.createLoanApplication(Mockito.any(Application.class)))
-                .thenReturn(Mono.just(mockUseCaseResponse));
-
-        Mockito.when(mapper.toResponse(Mockito.any(ApplicationCreationResult.class)))
-                .thenReturn(new ResponseRecord(null, null, null));
-
-        // Act & Assert
-        webTestClient.post()
-                .uri("/api/v1/solicitud")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestRecord)
-                .exchange()
-                .expectStatus().isCreated();
-    }
-
+    /**
+     * Configuración de prueba anidada.
+     * Le dice a este test cómo crear los beans que el Handler necesita,
+     * usando mocks que podemos controlar.
+     */
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -106,5 +59,55 @@ class RouterRestTest {
         public Validator validator() {
             return Mockito.mock(Validator.class);
         }
+    }
+
+    @Autowired
+    private WebTestClient webTestClient;
+
+    @Autowired
+    private ApplicationUseCase useCase;
+
+    @Autowired
+    private IApplicationMapper mapper;
+
+    @Autowired
+    private Validator validator;
+
+    @Test
+    void shouldCreateLoanApplicationSuccessfully() {
+        var requestRecord = new ApplicationRequestRecord(
+                UUID.randomUUID(),
+                BigDecimal.TEN,
+                12,
+                "test@test.com",
+                1,
+                1
+        );
+
+        var mockUseCaseResponse = new ApplicationCreationResult(
+                new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1),
+                new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true),
+                new Status(1, "PENDIENTE", "Pendiente de revisión"),
+                new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), "test@test.com", "123456", "3001234567", 2, 50000.0)
+        );
+
+        Mockito.when(validator.validate(Mockito.any(ApplicationRequestRecord.class)))
+                .thenReturn(Collections.emptySet());
+
+        Mockito.when(mapper.toModel(Mockito.any(ApplicationRequestRecord.class)))
+                .thenReturn(new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1));
+
+        Mockito.when(useCase.createLoanApplication(Mockito.any(Application.class)))
+                .thenReturn(Mono.just(mockUseCaseResponse));
+
+        Mockito.when(mapper.toResponse(Mockito.any(ApplicationCreationResult.class)))
+                .thenReturn(new ResponseRecord(null, null, null));
+
+        webTestClient.post()
+                .uri("/api/v1/solicitud")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestRecord)
+                .exchange()
+                .expectStatus().isCreated();
     }
 }

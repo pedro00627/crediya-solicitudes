@@ -88,7 +88,7 @@ public class ApplicationUseCase {
      */
     private Mono<ApplicationCreationResult> saveApplicationAndBuildResult(Application applicationRequest, ValidationData data) {
         Application applicationToSave = new Application(
-                UUID.randomUUID(), // El ID se genera en la capa de aplicación.
+                null, // El ID se genera en la capa de aplicación.
                 applicationRequest.getAmount(),
                 applicationRequest.getTerm(),
                 applicationRequest.getEmail(),

@@ -90,9 +90,9 @@ class ApplicationUseCaseTest {
         StepVerifier.create(result)
                 .assertNext(creationResult -> {
                     assertNotNull(creationResult);
-                    assertEquals(validUser.getEmail(), creationResult.getUser().getEmail());
-                    assertEquals(validLoanType.getName(), creationResult.getLoanType().getName());
-                    assertEquals(validStatus.getName(), creationResult.getStatus().getName());
+                    assertEquals(validUser.getEmail(), creationResult.user().getEmail());
+                    assertEquals(validLoanType.getName(), creationResult.loanType().getName());
+                    assertEquals(validStatus.getName(), creationResult.status().getName());
                 })
                 .verifyComplete();
     }
