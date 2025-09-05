@@ -71,8 +71,10 @@ resilience4j:
 # Propiedades de negocio externalizadas
 app:
   rules:
-    clientRoleId: 2
-    pendingStatusId: 1
+    client-role-id: 2
+    pending-status-id: 1
+    # Asegúrate de que esta sección exista y esté bien indentada
+    terminal-status-ids: [2, 3, 4] # 2=APROBADO, 3=RECHAZADO, 4=CANCELADO
 
 logging:
   config: classpath:log4j2-spring.xml

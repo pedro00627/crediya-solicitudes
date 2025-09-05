@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    // If LogHelper has its own dependencies (e.g., for logging), add them here.
+    api 'org.apache.logging.log4j:log4j-api'
 }

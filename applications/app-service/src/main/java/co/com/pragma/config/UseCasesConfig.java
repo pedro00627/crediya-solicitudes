@@ -1,21 +1,16 @@
 package co.com.pragma.config;
 
 import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.status.gateways.StatusGateway;
 import co.com.pragma.model.user.gateways.UserGateway;
 import co.com.pragma.usecase.application.ApplicationUseCase;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 
 @Configuration
-@ComponentScan(basePackages = "co.com.pragma.usecase",
-        includeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "^.+UseCase$")
-        },
-        useDefaultFilters = false)
 public class UseCasesConfig {
 
     @Bean
@@ -24,14 +19,15 @@ public class UseCasesConfig {
             StatusGateway statusGateway,
             UserGateway userGateway,
             ApplicationRepository applicationRepository,
+            LoggerPort logger,
             AppRules appRules) { // <-- Se inyecta el bean de reglas de negocio.
         return new ApplicationUseCase(
                 loanTypeGateway,
                 statusGateway,
                 userGateway,
                 applicationRepository,
-                appRules.clientRoleId(), // <-- Se pasa el ID del rol de cliente.
-                appRules.pendingStatusId() // <-- Se pasa el ID del estado pendiente.
+                logger,
+                appRules // Se pasa el objeto de reglas completo.
         );
     }
 }

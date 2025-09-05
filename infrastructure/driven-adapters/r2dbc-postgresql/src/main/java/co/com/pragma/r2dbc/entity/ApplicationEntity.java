@@ -18,6 +18,9 @@ public class ApplicationEntity {
     @Column("id_solicitud")
     java.util.UUID applicationId;
 
+    @Column("documento_identidad")
+    String documentId;
+
     @Column("monto")
     java.math.BigDecimal amount;
     @Column("plazo")

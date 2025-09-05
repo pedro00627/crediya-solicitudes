@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Application {
     private UUID applicationId;
+    private String documentId;
     private BigDecimal amount;
     private int term;
     private String email;

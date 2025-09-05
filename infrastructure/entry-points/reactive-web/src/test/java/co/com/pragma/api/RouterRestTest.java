@@ -55,7 +55,7 @@ class RouterRestTest {
         );
 
         var mockUseCaseResponse = new ApplicationCreationResult(
-                new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1),
+                new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, "test@test.com", 1, 1),
                 new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true),
                 new Status(1, "PENDIENTE", "Pendiente de revisión"),
                 new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), "test@test.com", "123456", "3001234567", 2, 50000.0)
@@ -65,7 +65,7 @@ class RouterRestTest {
                 .thenReturn(Collections.emptySet());
 
         Mockito.when(mapper.toModel(Mockito.any(ApplicationRequestRecord.class)))
-                .thenReturn(new Application(UUID.randomUUID(), BigDecimal.TEN, 12, "test@test.com", 1, 1));
+                .thenReturn(new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, "test@test.com", 1, 1));
 
         Mockito.when(useCase.createLoanApplication(Mockito.any(Application.class)))
                 .thenReturn(Mono.just(mockUseCaseResponse));

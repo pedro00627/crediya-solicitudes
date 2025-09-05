@@ -56,7 +56,7 @@
             <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Root Logger: Captura todo lo demás con un nivel por defecto 'warn' -->
+        <!-- Root Logger: Captura todos los demás con un nivel por defecto 'warn' -->
         <Root level="warn">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>

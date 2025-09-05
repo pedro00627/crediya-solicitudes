@@ -2,8 +2,7 @@ package co.com.pragma.api.exception.strategy;
 
 import co.com.pragma.api.exception.dto.ErrorBody;
 import co.com.pragma.api.exception.dto.ErrorResponseWrapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -12,25 +11,21 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE) // Se ejecutará al final si ninguna otra estrategia coincide
+@Order(Ordered.LOWEST_PRECEDENCE) // La prioridad más baja para que sea el último recurso
+@Slf4j
 public class DefaultExceptionHandler implements ExceptionHandlerStrategy {
-
-    private static final Logger log = LogManager.getLogger(DefaultExceptionHandler.class);
 
     @Override
     public boolean supports(Class<? extends Throwable> type) {
-        // Este es el manejador de respaldo, siempre aplica.
-        return true;
+        return true; // Atrapa todos los errores que los otros no atraparon
     }
 
     @Override
     public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
+        // Logueamos el error con el stack trace completo para un diagnóstico detallado
+        log.error("Error inesperado para la petición [{}]: {}", exchange.getRequest().getPath(), ex.getMessage(), ex);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        log.error("Ocurrió una excepción no controlada para la petición [{}]", exchange.getRequest().getPath(), ex);
-
-        String message = "Ocurrió un error inesperado. Por favor, contacte al soporte.";
-        ErrorBody body = new ErrorBody(status.value(), "Internal Server Error", message, null);
-
+        ErrorBody body = new ErrorBody(status.value(), "Internal Server Error", "Ocurrió un error inesperado.", null);
         return Mono.just(new ErrorResponseWrapper(status, body));
     }
 }

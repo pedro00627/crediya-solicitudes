@@ -63,7 +63,9 @@ subprojects {
     }
 
     jacocoTestReport {
-        dependsOn test, 'pitest'
+        // Se elimina la dependencia de 'pitest' para que no se ejecute en cada build.
+        // Esto hace el build más rápido y resiliente. Pitest se puede ejecutar manualmente.
+        dependsOn test
         reports {
             xml.setRequired true
             xml.setOutputLocation layout.buildDirectory.file("reports/jacoco.xml")
@@ -80,7 +82,9 @@ jacoco {
 }
 
 tasks.register('jacocoMergedReport', JacocoReport) {
-    dependsOn = [test, subprojects.jacocoTestReport, pitestReportAggregate]
+    // Se elimina la dependencia de pitestReportAggregate para que esta tarea
+    // genere únicamente el reporte de cobertura de JaCoCo.
+    dependsOn = [test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     classDirectories.setFrom files(subprojects.sourceSets.main.output)
@@ -90,6 +94,12 @@ tasks.register('jacocoMergedReport', JacocoReport) {
         csv.setRequired false
         html.setRequired true
     }
+}
+
+tasks.register('fullQualityReport') {
+    group = 'verification'
+    description = 'Runs all tests, code coverage, and mutation testing reports.'
+    dependsOn jacocoMergedReport, pitestReportAggregate
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -27,19 +27,20 @@ public class Handler {
 
     public Mono<ServerResponse> createLoanApplication(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ApplicationRequestRecord.class)
-                .doOnNext(request -> log.info("Petición recibida para crear solicitud. Email: {}",
-                        LogHelper.maskEmail(request.email())))
-                .map(request -> {
-                    Set<ConstraintViolation<ApplicationRequestRecord>> violations = validator.validate(request);
-                    if (!violations.isEmpty()) {
-                        throw new InvalidRequestException(violations);
-                    }
-                    return mapper.toModel(request);
-                })
+                .doOnNext(this::validateRequest)
+                .map(mapper::toModel)
                 .flatMap(useCase::createLoanApplication)
                 .doOnSuccess(result -> log.info("Proceso de creación de solicitud finalizado exitosamente para el ID: {}",
                         result.application().getApplicationId()))
                 .map(mapper::toResponse)
                 .flatMap(response -> ServerResponse.status(HttpStatus.CREATED).bodyValue(response));
+    }
+
+    private void validateRequest(ApplicationRequestRecord request) {
+        log.info("Petición recibida para crear solicitud para el email: {}", LogHelper.maskEmail(request.email()));
+        Set<ConstraintViolation<ApplicationRequestRecord>> violations = validator.validate(request);
+        if (!violations.isEmpty()) {
+            throw new InvalidRequestException(violations);
+        }
     }
 }
