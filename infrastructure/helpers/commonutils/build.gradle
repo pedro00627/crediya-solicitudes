@@ -1,0 +1,7 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // If LogHelper has its own dependencies (e.g., for logging), add them here.
+}

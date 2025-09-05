@@ -2,8 +2,8 @@ package co.com.pragma.r2dbc.repository;
 
 import co.com.pragma.model.status.Status;
 import co.com.pragma.model.status.gateways.StatusGateway;
-import co.com.pragma.r2dbc.mapper.StatusMapper;
 import co.com.pragma.r2dbc.interfaces.StatusReactiveRepository;
+import co.com.pragma.r2dbc.mapper.StatusMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;

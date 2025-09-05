@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RestConsumerTest {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
     public static MockWebServer mockBackEnd;
     private static RestConsumer restConsumer;
-    private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @BeforeAll
     static void setUp() throws IOException {

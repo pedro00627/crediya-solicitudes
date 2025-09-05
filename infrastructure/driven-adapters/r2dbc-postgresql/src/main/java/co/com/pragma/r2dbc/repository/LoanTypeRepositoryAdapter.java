@@ -2,8 +2,8 @@ package co.com.pragma.r2dbc.repository;
 
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
-import co.com.pragma.r2dbc.mapper.LoanTypeMapper;
 import co.com.pragma.r2dbc.interfaces.LoanTypeDataRepository;
+import co.com.pragma.r2dbc.mapper.LoanTypeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;

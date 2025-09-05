@@ -1,9 +1,14 @@
-package co.com.pragma.usecase.helpers;
+package co.com.pragma.commonutils;
+
+import java.util.regex.Pattern;
 
 public final class LogHelper {
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
+
     private LogHelper() {
-        // Clase de utilidad, no debe ser instanciada
+        // Private constructor for utility class
     }
 
     /**
@@ -14,13 +19,13 @@ public final class LogHelper {
      * @return El correo electrónico enmascarado.
      */
     public static String maskEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            return "invalid-email";
+        if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
+            return "invalid-email-format";
         }
         int atIndex = email.indexOf('@');
-        if (atIndex <= 1) {
+        if (atIndex <= 2) {
             return "***" + email.substring(atIndex);
         }
-        return email.charAt(0) + "***" + email.charAt(atIndex - 1) + email.substring(atIndex);
+        return email.substring(0, 2) + "***" + email.substring(atIndex);
     }
 }

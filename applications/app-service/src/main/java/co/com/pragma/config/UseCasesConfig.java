@@ -30,8 +30,8 @@ public class UseCasesConfig {
                 statusGateway,
                 userGateway,
                 applicationRepository,
-                appRules.getClientRoleId(), // <-- Se pasa el ID del rol de cliente.
-                appRules.getPendingStatusId() // <-- Se pasa el ID del estado pendiente.
+                appRules.clientRoleId(), // <-- Se pasa el ID del rol de cliente.
+                appRules.pendingStatusId() // <-- Se pasa el ID del estado pendiente.
         );
     }
 }

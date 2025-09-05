@@ -16,8 +16,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 public class ApplicationUseCase {
 
@@ -30,18 +28,6 @@ public class ApplicationUseCase {
     // Business rule values are now simple fields, injected via the constructor.
     private final Integer clientRoleId;
     private final Integer pendingStatusId;
-
-    /**
-     * Clase interna para agrupar los datos necesarios para la validación.
-     * Reemplaza el record para ser consistente con el uso de getters.
-     */
-    @Getter
-    @AllArgsConstructor
-    private static class ValidationData {
-        private final LoanType loanType;
-        private final UserRecord user;
-        private final Status initialStatus;
-    }
 
     /**
      * Orquesta el proceso de creación de una nueva solicitud de préstamo.
@@ -103,5 +89,17 @@ public class ApplicationUseCase {
                         data.getInitialStatus(),
                         data.getUser()
                 ));
+    }
+
+    /**
+     * Clase interna para agrupar los datos necesarios para la validación.
+     * Reemplaza el record para ser consistente con el uso de getters.
+     */
+    @Getter
+    @AllArgsConstructor
+    private static class ValidationData {
+        private final LoanType loanType;
+        private final UserRecord user;
+        private final Status initialStatus;
     }
 }

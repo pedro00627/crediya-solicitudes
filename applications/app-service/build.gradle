@@ -7,7 +7,7 @@ configurations {
 }
 
 dependencies {
-	testImplementation 'com.tngtech.archunit:archunit:1.4.1'
+    testImplementation 'com.tngtech.archunit:archunit:1.4.1'
     implementation project(':rest-consumer')
     implementation project(':r2dbc-postgresql')
     implementation project(':reactive-web')

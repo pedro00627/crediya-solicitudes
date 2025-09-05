@@ -34,42 +34,12 @@ import java.util.UUID;
 @Import({RouterRest.class, Handler.class, RouterRestTest.TestConfig.class})
 class RouterRestTest {
 
-    // Esta clase vacía actúa como el ancla que Spring Boot necesita para iniciar el contexto de prueba.
-    @SpringBootConfiguration
-    static class TestApplication {}
-
-    /**
-     * Configuración de prueba anidada.
-     * Le dice a este test cómo crear los beans que el Handler necesita,
-     * usando mocks que podemos controlar.
-     */
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public ApplicationUseCase applicationUseCase() {
-            return Mockito.mock(ApplicationUseCase.class);
-        }
-
-        @Bean
-        public IApplicationMapper iApplicationMapper() {
-            return Mockito.mock(IApplicationMapper.class);
-        }
-
-        @Bean
-        public Validator validator() {
-            return Mockito.mock(Validator.class);
-        }
-    }
-
     @Autowired
     private WebTestClient webTestClient;
-
     @Autowired
     private ApplicationUseCase useCase;
-
     @Autowired
     private IApplicationMapper mapper;
-
     @Autowired
     private Validator validator;
 
@@ -109,5 +79,33 @@ class RouterRestTest {
                 .bodyValue(requestRecord)
                 .exchange()
                 .expectStatus().isCreated();
+    }
+
+    // Esta clase vacía actúa como el ancla que Spring Boot necesita para iniciar el contexto de prueba.
+    @SpringBootConfiguration
+    static class TestApplication {
+    }
+
+    /**
+     * Configuración de prueba anidada.
+     * Le dice a este test cómo crear los beans que el Handler necesita,
+     * usando mocks que podemos controlar.
+     */
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ApplicationUseCase applicationUseCase() {
+            return Mockito.mock(ApplicationUseCase.class);
+        }
+
+        @Bean
+        public IApplicationMapper iApplicationMapper() {
+            return Mockito.mock(IApplicationMapper.class);
+        }
+
+        @Bean
+        public Validator validator() {
+            return Mockito.mock(Validator.class);
+        }
     }
 }

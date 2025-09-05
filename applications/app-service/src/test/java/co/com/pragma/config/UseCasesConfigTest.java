@@ -35,12 +35,12 @@ class UseCasesConfigTest {
 
     @TestConfiguration
     static class MockDependenciesConfig {
-        @Bean("loanTypeReactiveGatewayAdapter")
+        @Bean
         public LoanTypeGateway loanTypeGateway() {
             return Mockito.mock(LoanTypeGateway.class);
         }
 
-        @Bean("statusReactiveGatewayAdapter")
+        @Bean
         public StatusGateway statusGateway() {
             return Mockito.mock(StatusGateway.class);
         }
@@ -53,6 +53,11 @@ class UseCasesConfigTest {
         @Bean
         public ApplicationRepository applicationRepository() {
             return Mockito.mock(ApplicationRepository.class);
+        }
+
+        @Bean
+        public AppRules appRules() {
+            return Mockito.mock(AppRules.class);
         }
     }
 }

@@ -3,8 +3,8 @@ package co.com.pragma.api;
 import co.com.pragma.api.dto.request.ApplicationRequestRecord;
 import co.com.pragma.api.exception.InvalidRequestException;
 import co.com.pragma.api.mapper.IApplicationMapper;
+import co.com.pragma.commonutils.LogHelper;
 import co.com.pragma.usecase.application.ApplicationUseCase;
-import co.com.pragma.usecase.helpers.LogHelper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class Handler {
                 })
                 .flatMap(useCase::createLoanApplication)
                 .doOnSuccess(result -> log.info("Proceso de creación de solicitud finalizado exitosamente para el ID: {}",
-                        result.application().getApplicationId())) // CORREGIDO: Usando el getter correcto
+                        result.application().getApplicationId()))
                 .map(mapper::toResponse)
                 .flatMap(response -> ServerResponse.status(HttpStatus.CREATED).bodyValue(response));
     }
