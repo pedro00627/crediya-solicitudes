@@ -21,11 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 // Esto nos da control total sobre el contexto de la aplicación para este test.
 // Al separar la configuración, ahora solo necesitamos cargar UseCasesConfig.
 // MockDependenciesConfig proporcionará todos los beans que UseCasesConfig necesita.
-@SpringBootTest(classes = { UseCasesConfig.class, UseCasesConfigTest.MockDependenciesConfig.class })
+@SpringBootTest(classes = {UseCasesConfig.class, UseCasesConfigTest.MockDependenciesConfig.class})
 class UseCasesConfigTest {
 
     @Autowired
     private ApplicationUseCase applicationUseCase;
+
+    @Test
+    void applicationUseCaseShouldBeCreated() {
+        // La prueba ahora simplemente verifica que el contexto de Spring pudo
+        // crear el bean 'applicationUseCase' inyectando todos los mocks.
+        assertNotNull(applicationUseCase);
+    }
 
     /**
      * Esta clase de configuración interna proporciona mocks para todas las dependencias
@@ -70,12 +77,5 @@ class UseCasesConfigTest {
         public AppRules appRules() {
             return Mockito.mock(AppRules.class);
         }
-    }
-
-    @Test
-    void applicationUseCaseShouldBeCreated() {
-        // La prueba ahora simplemente verifica que el contexto de Spring pudo
-        // crear el bean 'applicationUseCase' inyectando todos los mocks.
-        assertNotNull(applicationUseCase);
     }
 }

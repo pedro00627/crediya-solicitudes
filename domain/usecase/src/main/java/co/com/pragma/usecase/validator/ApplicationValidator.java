@@ -9,9 +9,10 @@ import java.math.BigDecimal;
 
 public class ApplicationValidator {
 
-    private ApplicationValidator (){
+    private ApplicationValidator() {
 
     }
+
     /**
      * Valida que el rol de un usuario corresponda al ID de rol requerido.
      * Lanza una BusinessException si el rol no es el correcto.

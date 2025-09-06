@@ -11,4 +11,5 @@ public record AppRules(
         Integer clientRoleId,
         Integer pendingStatusId,
         List<Integer> terminalStatusIds
-) {}
+) {
+}

@@ -20,7 +20,8 @@ public interface IApplicationMapper {
     // Mapea el request DTO al modelo de dominio, ignorando los campos que se generan en el backend.
     @Mapping(target = "applicationId", ignore = true)
     @Mapping(target = "statusId", ignore = true)
-    @Mapping(target = "documentId", ignore = true) // Se ignora porque se enriquece en el UseCase.
+    @Mapping(target = "documentId", ignore = true)
+    // Se ignora porque se enriquece en el UseCase.
     Application toModel(ApplicationRequestRecord requestRecord);
 
     // Ayuda a MapStruct a mapear el ID del dominio al ID del DTO de respuesta

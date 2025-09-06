@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface ApplicationRepository {
     Mono<Application> save(Application application);
+
     Flux<Application> findOpenApplicationsByDocumentId(String documentId, List<Integer> statusIds);
 }

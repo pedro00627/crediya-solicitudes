@@ -2,8 +2,8 @@ package co.com.pragma.usecase.application;
 
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
-import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
@@ -23,8 +23,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -72,7 +72,7 @@ class ApplicationUseCaseTest {
         );
 
         // --- Objetos de Dominio Válidos ---
-        applicationRequest = new Application(null,"", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1);
+        applicationRequest = new Application(null, "", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1);
         validLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.valueOf(5000), BigDecimal.valueOf(20000), BigDecimal.valueOf(0.05), true);
         validUser = new UserRecord("1", "Test", "Client", LocalDate.now(), "test@test.com", "123", "300", 2, 50000.0);
         validStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");

@@ -17,8 +17,15 @@
     </Appenders>
 
     <Loggers>
+        <!-- Se añade un logger específico para el UseCase con nivel DEBUG -->
+        <!-- Esto nos permite ver los logs de seguimiento sin el ruido de otros componentes. -->
+        <Logger name="co.com.pragma.usecase" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+
         <!-- Log para nuestro código de aplicación. Nivel INFO para ver el flujo de negocio. -->
-        <Logger name="co.com.pragma" level="info" additivity="false">
+        <Logger name="co.com.pragma" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Logger>

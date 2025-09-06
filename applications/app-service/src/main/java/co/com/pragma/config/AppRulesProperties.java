@@ -9,7 +9,11 @@ import java.util.List;
 @Validated
 @ConfigurationProperties(prefix = "app.rules")
 public record AppRulesProperties(
-        @NotNull Integer clientRoleId,
-        @NotNull Integer pendingStatusId,
-        @NotNull List<Integer> terminalStatusIds
-) {}
+        @NotNull
+        Integer clientRoleId,
+        @NotNull
+        Integer pendingStatusId,
+        @NotNull
+        List<Integer> terminalStatusIds
+) {
+}
