@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -33,6 +34,9 @@ public class RestConsumer implements UserGateway {
                 .retrieve()
                 .bodyToMono(UserRecord.class)
                 .doOnError(error -> log.error("Error al consultar el servicio de usuarios por email {}: {}",
-                        LogHelper.maskEmail(email), error.getMessage()));
+                        LogHelper.maskEmail(email), error.getMessage()))
+                // Se añade el manejo de error para el 404.
+                // Si se recibe un NotFound, se traduce a un Mono vacío, cumpliendo el contrato del Gateway.
+                .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());
     }
 }

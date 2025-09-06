@@ -75,6 +75,9 @@ public class ApplicationUseCase {
     }
 
     private Mono<UserRecord> findAndValidateUser(String email) {
+        // El UseCase confía en que el Gateway devolverá un Mono vacío si el usuario no se encuentra.
+        // La responsabilidad de manejar excepciones de red (como un 404) es del Gateway.
+        // Aquí, simplemente traducimos la ausencia de un usuario en un error de negocio.
         return userGateway.findUserByEmail(email)
                 .switchIfEmpty(Mono.error(new BusinessException("El usuario con el email especificado no existe.")));
     }
