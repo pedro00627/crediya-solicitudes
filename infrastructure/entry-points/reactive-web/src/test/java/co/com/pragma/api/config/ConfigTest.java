@@ -3,6 +3,7 @@ package co.com.pragma.api.config;
 import co.com.pragma.api.Handler;
 import co.com.pragma.api.RouterRest;
 import co.com.pragma.api.mapper.IApplicationMapper;
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.usecase.application.ApplicationUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,11 @@ class ConfigTest {
         @Bean
         public Validator validator() {
             return Mockito.mock(Validator.class);
+        }
+
+        @Bean
+        public LoggerPort loggerPort() {
+            return Mockito.mock(LoggerPort.class);
         }
     }
 

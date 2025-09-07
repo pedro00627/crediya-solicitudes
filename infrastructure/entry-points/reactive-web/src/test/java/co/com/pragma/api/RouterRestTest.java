@@ -6,6 +6,7 @@ import co.com.pragma.api.mapper.IApplicationMapper;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.loantype.LoanType;
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.status.Status;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.usecase.application.ApplicationUseCase;
@@ -81,16 +82,10 @@ class RouterRestTest {
                 .expectStatus().isCreated();
     }
 
-    // Esta clase vacía actúa como el ancla que Spring Boot necesita para iniciar el contexto de prueba.
     @SpringBootConfiguration
     static class TestApplication {
     }
 
-    /**
-     * Configuración de prueba anidada.
-     * Le dice a este test cómo crear los beans que el Handler necesita,
-     * usando mocks que podemos controlar.
-     */
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -106,6 +101,11 @@ class RouterRestTest {
         @Bean
         public Validator validator() {
             return Mockito.mock(Validator.class);
+        }
+
+        @Bean
+        public LoggerPort loggerPort() {
+            return Mockito.mock(LoggerPort.class);
         }
     }
 }

@@ -8,4 +8,6 @@ public interface LoggerPort {
     void error(String message, Throwable throwable);
 
     String maskEmail(String email);
+
+    String maskDocument(String documentId);
 }

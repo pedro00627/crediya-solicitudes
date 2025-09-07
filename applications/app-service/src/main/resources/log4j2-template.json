@@ -29,10 +29,5 @@
   "message": {
     "$resolver": "message",
     "stringified": true
-  },
-  "stackTrace": {
-    "$resolver": "exception",
-    "field": "stackTrace",
-    "stringified": true
   }
 }

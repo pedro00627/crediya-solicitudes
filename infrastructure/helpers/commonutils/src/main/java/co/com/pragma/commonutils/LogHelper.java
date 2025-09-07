@@ -29,4 +29,19 @@ public final class LogHelper {
         // Muestra el primer y último caracter de la parte local para mayor seguridad, como indica el comentario.
         return localPart.charAt(0) + "***" + localPart.charAt(localPart.length() - 1) + email.substring(atIndex);
     }
+
+    /**
+     * Enmascara un número de documento de identidad para logging seguro.
+     * Muestra el primer y los últimos cuatro dígitos.
+     * Ejemplo: "1234567890" -> "1****7890"
+     *
+     * @param documentId El número de documento a enmascarar.
+     * @return El documento enmascarado.
+     */
+    public static String maskDocument(String documentId) {
+        if (documentId == null || documentId.length() < 6) { // Requiere al menos 6 caracteres para aplicar la regla de forma segura.
+            return "***";
+        }
+        return documentId.charAt(0) + "****" + documentId.substring(documentId.length() - 4);
+    }
 }

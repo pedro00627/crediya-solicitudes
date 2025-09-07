@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api 'org.apache.logging.log4j:log4j-api'
+    // No dependencies are needed for this helper module.
 }

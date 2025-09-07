@@ -5,14 +5,14 @@
     </Properties>
 
     <Appenders>
-        <!-- Appender para la Consola con formato JSON estructurado -->
+        <!-- Appender para la Consola con formato JSON estándar -->
         <Console name="Console" target="SYSTEM_OUT">
-            <JsonTemplateLayout eventTemplateUri="classpath:log4j2-template.json"/>
+            <JSONLayout compact="true" eventEol="true" />
         </Console>
 
         <!-- Appender para Archivo, escribirá en ./logs/log.log -->
         <File name="File" fileName="${LOG_PATH}/log.log">
-            <JsonTemplateLayout eventTemplateUri="classpath:log4j2-template.json"/>
+            <JSONLayout compact="true" eventEol="true" />
         </File>
     </Appenders>
 

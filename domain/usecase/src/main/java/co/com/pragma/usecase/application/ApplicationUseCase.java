@@ -87,7 +87,7 @@ public class ApplicationUseCase {
         // Se añade logging para trazar la entrada y salida del método.
         logger.debug("Buscando y validando User con email: {}", logger.maskEmail(email));
         return findOrThrow(userGateway.findUserByEmail(email), BusinessMessages.USER_NOT_FOUND)
-                .doOnSuccess(user -> logger.debug("User encontrado y validado: documentId={}", user.getIdentityDocument()));
+                .doOnSuccess(user -> logger.debug("User encontrado y validado: documentId={}", logger.maskDocument(user.getIdentityDocument())));
     }
 
     /**
@@ -114,12 +114,12 @@ public class ApplicationUseCase {
                     // LOG DE SEGUIMIENTO CRÍTICO: Verificamos el documento exacto que se usa en la consulta.
                     String documentId = validationData.user().getIdentityDocument();
                     logger.debug("Paso 1.5: Verificando solicitudes abiertas para el usuario: {} con documentId: {}",
-                            logger.maskEmail(validationData.user().getEmail()), documentId);
+                            logger.maskEmail(validationData.user().getEmail()), logger.maskDocument(documentId));
 
                     return applicationRepository.findOpenApplicationsByDocumentId(validationData.user().getIdentityDocument(), appRules.terminalStatusIds())
                             .hasElements()
                             .flatMap(hasOpen -> Boolean.TRUE.equals(hasOpen)
-                                    ? Mono.error(new BusinessException(BusinessMessages.CLIENT_HAS_OPEN_APPLICATION))
+                                    ? Mono.error(new BusinessException(BusinessMessages.USER_HAS_ACTIVE_APPLICATION))
                                     : Mono.just(validationData)); // Continúa el flujo si no hay solicitudes abiertas.
                 });
     }

@@ -1,11 +1,11 @@
 package co.com.pragma.r2dbc.repository;
 
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.status.Status;
 import co.com.pragma.model.status.gateways.StatusGateway;
 import co.com.pragma.r2dbc.interfaces.StatusReactiveRepository;
 import co.com.pragma.r2dbc.mapper.StatusMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Repository;
@@ -15,12 +15,12 @@ import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
 public class StatusRepositoryAdapter implements StatusGateway {
 
     private final StatusReactiveRepository repository;
     private final StatusMapper statusMapper;
     private final CacheManager cacheManager;
+    private final LoggerPort logger;
 
     @Override
     public Mono<Status> findById(Integer id) {
@@ -31,7 +31,7 @@ public class StatusRepositoryAdapter implements StatusGateway {
         return Mono.fromCallable(() -> cache.get(id, Status.class))
                 .doOnSuccess(status -> {
                     if (status != null) {
-                        log.info("==> CACHE HIT. Obteniendo ESTADO desde la caché con ID: {}", id);
+                        logger.info("==> CACHE HIT. Obteniendo ESTADO desde la caché con ID: {}", id);
                     }
                 })
                 // Si el Mono de la caché está vacío (CACHE MISS), cambia al Mono de la base de datos.
@@ -45,7 +45,7 @@ public class StatusRepositoryAdapter implements StatusGateway {
      * 3. Guarda el resultado en la caché como un efecto secundario.
      */
     private Mono<Status> getFromDatabaseAndCache(Integer id, Cache cache) {
-        log.info("==> CACHE MISS. Consultando ESTADO desde la BD con ID: {}", id);
+        logger.info("==> CACHE MISS. Consultando ESTADO desde la BD con ID: {}", id);
         return repository.findById(String.valueOf(id))
                 .map(statusMapper::toDomain)
                 .doOnSuccess(statusFromDb -> {

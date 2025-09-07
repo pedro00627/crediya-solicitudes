@@ -1,5 +1,6 @@
 package co.com.pragma.consumer;
 
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.user.UserRecord;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,7 +37,8 @@ class RestConsumerTest {
         String baseUrl = mockBackEnd.url("/").toString();
         WebClient.Builder webClientBuilder = WebClient.builder();
 
-        restConsumer = new RestConsumer(webClientBuilder, baseUrl);
+        LoggerPort logger = Mockito.mock(LoggerPort.class); // Initialize the logger mock
+        restConsumer = new RestConsumer(webClientBuilder, baseUrl, logger);
     }
 
     @AfterAll

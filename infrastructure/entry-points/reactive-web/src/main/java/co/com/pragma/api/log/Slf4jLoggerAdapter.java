@@ -2,12 +2,9 @@ package co.com.pragma.api.log;
 
 import co.com.pragma.commonutils.LogHelper;
 import co.com.pragma.model.log.gateways.LoggerPort;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-@Component
-@Slf4j
 public class Slf4jLoggerAdapter implements LoggerPort {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Slf4jLoggerAdapter.class);
 
     @Override
     public void info(String message, Object... args) {
@@ -27,5 +24,10 @@ public class Slf4jLoggerAdapter implements LoggerPort {
     @Override
     public String maskEmail(String email) {
         return LogHelper.maskEmail(email);
+    }
+
+    @Override
+    public String maskDocument(String documentId) {
+        return LogHelper.maskDocument(documentId);
     }
 }

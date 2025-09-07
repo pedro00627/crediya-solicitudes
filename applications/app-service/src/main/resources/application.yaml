@@ -31,6 +31,9 @@ management:
   health:
     circuitbreakers:
       enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # Captura el 100% de las trazas en desarrollo
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 adapters:

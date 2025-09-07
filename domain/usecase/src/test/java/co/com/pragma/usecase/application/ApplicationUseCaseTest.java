@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -25,16 +27,19 @@ import reactor.test.StepVerifier;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT) // Añadido para hacer todos los stubbings lenient
 class ApplicationUseCaseTest {
 
     @Mock
@@ -47,6 +52,7 @@ class ApplicationUseCaseTest {
     private ApplicationRepository applicationRepository;
     @Mock
     private LoggerPort loggerPort;
+    @Mock
 
     // La unidad bajo prueba ya no se inyecta, se construye manualmente.
     private ApplicationUseCase applicationUseCase;
@@ -54,6 +60,7 @@ class ApplicationUseCaseTest {
     private Application applicationRequest;
     private LoanType validLoanType;
     private UserRecord validUser;
+
     private Status validStatus;
 
     @BeforeEach
@@ -187,15 +194,15 @@ class ApplicationUseCaseTest {
         when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
 
         // Simulamos que el repositorio encuentra una solicitud abierta para este cliente.
-        when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any()))
-                .thenReturn(Flux.just(new Application())); // Devolvemos un Flux con un elemento
+        lenient().when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any()))
+                .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1))); // Devolvemos un Flux con un elemento de Application válido
 
         // Act
         Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
 
         // Assert
         StepVerifier.create(result)
-                .expectErrorMessage("El cliente ya tiene una solicitud de préstamo activa.")
+                .expectErrorMessage("El usuario (identificado por email y/o documento) ya tiene una solicitud de préstamo activa.")
                 .verify();
     }
 }

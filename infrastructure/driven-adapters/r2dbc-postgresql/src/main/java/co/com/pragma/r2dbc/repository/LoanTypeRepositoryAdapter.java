@@ -2,10 +2,10 @@ package co.com.pragma.r2dbc.repository;
 
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
+import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.r2dbc.interfaces.LoanTypeDataRepository;
 import co.com.pragma.r2dbc.mapper.LoanTypeMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Repository;
@@ -15,12 +15,12 @@ import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
 public class LoanTypeRepositoryAdapter implements LoanTypeGateway {
 
     private final LoanTypeDataRepository repository;
     private final LoanTypeMapper loanTypeMapper;
     private final CacheManager cacheManager; // Inyectamos el CacheManager
+    private final LoggerPort logger;
 
     @Override
     public Mono<LoanType> findById(Integer id) {
@@ -32,7 +32,7 @@ public class LoanTypeRepositoryAdapter implements LoanTypeGateway {
         return Mono.fromCallable(() -> cache.get(id, LoanType.class))
                 .doOnSuccess(loanType -> {
                     if (loanType != null) {
-                        log.info("==> CACHE HIT. Obteniendo TIPO DE PRÉSTAMO desde la caché con ID: {}", id);
+                        logger.info("==> CACHE HIT. Obteniendo TIPO DE PRÉSTAMO desde la caché con ID: {}", id);
                     }
                 })
                 // Si el Mono de la caché está vacío (CACHE MISS), cambia al Mono de la base de datos.
@@ -46,7 +46,7 @@ public class LoanTypeRepositoryAdapter implements LoanTypeGateway {
      * 3. Guarda el resultado en la caché como un efecto secundario.
      */
     private Mono<LoanType> getFromDatabaseAndCache(Integer id, Cache cache) {
-        log.info("==> CACHE MISS. Consultando TIPO DE PRÉSTAMO desde la BD con ID: {}", id);
+        logger.info("==> CACHE MISS. Consultando TIPO DE PRÉSTAMO desde la BD con ID: {}", id);
         return repository.findById(Integer.valueOf(String.valueOf(id)))
                 .map(loanTypeMapper::toDomain)
                 .doOnSuccess(loanTypeFromDb -> {

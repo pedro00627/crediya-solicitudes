@@ -2,8 +2,7 @@ package co.com.pragma.api.exception.strategy;
 
 import co.com.pragma.api.exception.dto.ErrorBody;
 import co.com.pragma.api.exception.dto.ErrorResponseWrapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import co.com.pragma.model.log.gateways.LoggerPort;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,11 @@ import reactor.core.publisher.Mono;
 @Order(1)
 public class ServerWebInputExceptionHandler implements ExceptionHandlerStrategy {
 
-    private static final Logger log = LogManager.getLogger(ServerWebInputExceptionHandler.class);
+    private final LoggerPort logger;
+
+    public ServerWebInputExceptionHandler(LoggerPort logger) {
+        this.logger = logger;
+    }
 
     @Override
     public boolean supports(Class<? extends Throwable> type) {
@@ -27,7 +30,8 @@ public class ServerWebInputExceptionHandler implements ExceptionHandlerStrategy 
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ServerWebInputException exception = (ServerWebInputException) ex;
 
-        log.warn("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
+        // Usamos el LoggerPort inyectado. Nota: se usa .info() porque LoggerPort no define .warn()
+        logger.info("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
 
         String reason = "El cuerpo de la petición tiene un formato inválido.";
         if (ex.getMessage().contains("LocalDate")) {
