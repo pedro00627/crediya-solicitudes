@@ -3,7 +3,7 @@ package co.com.pragma.r2dbc;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.r2dbc.entity.ApplicationEntity;
 import co.com.pragma.r2dbc.interfaces.ApplicationReactiveRepository;
-import co.com.pragma.r2dbc.repository.ApplicationReactiveRepositoryAdapter;
+import co.com.pragma.r2dbc.repository.ApplicationReactiveGatewayAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class ApplicationReactiveRepositoryAdapterTest {
 
     @InjectMocks
-    private ApplicationReactiveRepositoryAdapter adapter;
+    private ApplicationReactiveGatewayAdapter adapter;
 
     @Mock
     private ApplicationReactiveRepository repository;
