@@ -1,6 +1,6 @@
 package co.com.pragma.config;
 
-import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
 import co.com.pragma.model.log.gateways.LoggerPort;
@@ -58,8 +58,8 @@ class UseCasesConfigTest {
         }
 
         @Bean
-        public ApplicationRepository applicationRepository() {
-            return Mockito.mock(ApplicationRepository.class);
+        public ApplicationGateway applicationRepository() {
+            return Mockito.mock(ApplicationGateway.class);
         }
 
         @Bean

@@ -2,7 +2,7 @@ package co.com.pragma.usecase.application;
 
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
-import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.exception.BusinessMessages;
@@ -26,17 +26,17 @@ public class ApplicationUseCase {
     private final LoanTypeGateway loanTypeGateway;
     private final StatusGateway statusGateway;
     private final UserGateway userGateway;
-    private final ApplicationRepository applicationRepository;
+    private final ApplicationGateway applicationGateway;
     private final LoggerPort logger;
 
     // Las reglas de negocio ahora se agrupan en un único objeto para mayor claridad.
     private final AppRules appRules;
 
-    public ApplicationUseCase(LoanTypeGateway loanTypeGateway, StatusGateway statusGateway, UserGateway userGateway, ApplicationRepository applicationRepository, LoggerPort logger, AppRules appRules) {
+    public ApplicationUseCase(LoanTypeGateway loanTypeGateway, StatusGateway statusGateway, UserGateway userGateway, ApplicationGateway applicationGateway, LoggerPort logger, AppRules appRules) {
         this.loanTypeGateway = loanTypeGateway;
         this.statusGateway = statusGateway;
         this.userGateway = userGateway;
-        this.applicationRepository = applicationRepository;
+        this.applicationGateway = applicationGateway;
         this.logger = logger;
         // Validación "Fail-Fast": Asegura que la configuración crítica exista al iniciar.
         this.appRules = Objects.requireNonNull(appRules, "El objeto de reglas de negocio (AppRules) no puede ser nulo.");
@@ -116,7 +116,7 @@ public class ApplicationUseCase {
                     logger.debug("Paso 1.5: Verificando solicitudes abiertas para el usuario: {} con documentId: {}",
                             logger.maskEmail(validationData.user().getEmail()), logger.maskDocument(documentId));
 
-                    return applicationRepository.findOpenApplicationsByDocumentId(validationData.user().getIdentityDocument(), appRules.terminalStatusIds())
+                    return applicationGateway.findOpenApplicationsByDocumentId(validationData.user().getIdentityDocument(), appRules.terminalStatusIds())
                             .hasElements()
                             .flatMap(hasOpen -> Boolean.TRUE.equals(hasOpen)
                                     ? Mono.error(new BusinessException(BusinessMessages.USER_HAS_ACTIVE_APPLICATION))
@@ -156,7 +156,7 @@ public class ApplicationUseCase {
                 data.loanType().getLoanTypeId()
         );
 
-        return applicationRepository.save(applicationToSave)
+        return applicationGateway.save(applicationToSave)
                 .map(savedApplication -> new ApplicationCreationResult(savedApplication, data.loanType(), defaultStatus, data.user()));
     }
 

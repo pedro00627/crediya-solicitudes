@@ -17,7 +17,6 @@ spring:
       - statuses
       - loan_types
     caffeine:
-      # CORREGIDO: Se ajusta el tiempo de expiración a 1 hora (3600s)
       spec: maximumSize=500,expireAfterAccess=500s
 management:
   endpoints:
@@ -76,7 +75,6 @@ app:
   rules:
     client-role-id: 2
     pending-status-id: 1
-    # Asegúrate de que esta sección exista y esté bien indentada
     terminal-status-ids: [ 2, 3, 4 ] # 2=APROBADO, 3=RECHAZADO, 4=CANCELADO
 
 logging:

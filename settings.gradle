@@ -1,18 +1,14 @@
 pluginManagement {
     repositories {
-        maven { url = 'https://repo.spring.io/release' }
-        maven { url = 'https://repo.spring.io/milestone' }
-        maven { url = "https://repo.spring.io/snapshot" }
+        //mavenLocal()
+        //maven { url = '...' }
         gradlePluginPortal()
     }
 }
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven { url = 'https://repo.spring.io/milestone' }
-        maven { url = "https://repo.spring.io/snapshot" }
+buildCache {
+    local {
+        directory = new File(rootDir, 'build-cache')
     }
 }
 
@@ -33,8 +29,8 @@ project(':reactive-web').projectDir = file('./infrastructure/entry-points/reacti
 include ':r2dbc-postgresql'
 project(':r2dbc-postgresql').projectDir = file('./infrastructure/driven-adapters/r2dbc-postgresql')
 
-include ':rest-consumer'
-project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')
-
 include ':commonutils'
 project(':commonutils').projectDir = file('./infrastructure/helpers/commonutils')
+
+include ':rest-consumer'
+project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')

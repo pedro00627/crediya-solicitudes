@@ -7,12 +7,14 @@ configurations {
 }
 
 dependencies {
-    testImplementation 'com.tngtech.archunit:archunit:1.4.1'
     implementation project(':rest-consumer')
     implementation project(':r2dbc-postgresql')
     implementation project(':reactive-web')
     implementation project(':usecase')
     implementation project(':model')
+
+    testImplementation 'com.tngtech.archunit:archunit:1.4.1'
+
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter'

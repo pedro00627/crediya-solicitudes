@@ -6,11 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-/**
- * Representa un tipo de préstamo.
- * Convertido de un record a una clase para compatibilidad con librerías
- * que requieren un constructor sin argumentos.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

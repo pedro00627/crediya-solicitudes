@@ -1,6 +1,6 @@
 package co.com.pragma.config;
 
-import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
 import co.com.pragma.model.log.gateways.LoggerPort;
@@ -18,16 +18,16 @@ public class UseCasesConfig {
             LoanTypeGateway loanTypeGateway,
             StatusGateway statusGateway,
             UserGateway userGateway,
-            ApplicationRepository applicationRepository,
+            ApplicationGateway applicationGateway,
             LoggerPort logger,
-            AppRules appRules) { // <-- Se inyecta el bean de reglas de negocio.
+            AppRules appRules) {
         return new ApplicationUseCase(
                 loanTypeGateway,
                 statusGateway,
                 userGateway,
-                applicationRepository,
+                applicationGateway,
                 logger,
-                appRules // Se pasa el objeto de reglas completo.
+                appRules
         );
     }
 }

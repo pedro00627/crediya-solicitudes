@@ -7,11 +7,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/**
- * Representa la solicitud de préstamo en el dominio.
- * Convertido de un record a una clase para compatibilidad con librerías
- * y frameworks como Mockito.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

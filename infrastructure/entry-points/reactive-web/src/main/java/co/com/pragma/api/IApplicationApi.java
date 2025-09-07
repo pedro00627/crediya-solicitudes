@@ -28,5 +28,5 @@ public interface IApplicationApi {
                     @ApiResponse(responseCode = "409", description = "Conflicto de negocio (ej. usuario ya existe)", content = @Content(schema = @Schema(implementation = ErrorBody.class)))
             }
     )
-    Mono<ServerResponse> saveUseCase(ServerRequest serverRequest);
+    Mono<ServerResponse> createLoanApplication(ServerRequest serverRequest);
 }

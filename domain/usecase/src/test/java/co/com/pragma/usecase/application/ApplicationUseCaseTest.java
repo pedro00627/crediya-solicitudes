@@ -2,7 +2,7 @@ package co.com.pragma.usecase.application;
 
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
-import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.loantype.LoanType;
@@ -49,7 +49,7 @@ class ApplicationUseCaseTest {
     @Mock
     private UserGateway userGateway;
     @Mock
-    private ApplicationRepository applicationRepository;
+    private ApplicationGateway applicationGateway;
     @Mock
     private LoggerPort loggerPort;
     @Mock
@@ -73,7 +73,7 @@ class ApplicationUseCaseTest {
                 loanTypeGateway,
                 statusGateway,
                 userGateway,
-                applicationRepository,
+                applicationGateway,
                 loggerPort,
                 appRules
         );
@@ -94,8 +94,8 @@ class ApplicationUseCaseTest {
         when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
         when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
         when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
-        when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
-        when(applicationRepository.save(any(Application.class))).thenReturn(Mono.just(applicationRequest));
+        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        when(applicationGateway.save(any(Application.class))).thenReturn(Mono.just(applicationRequest));
 
         // Act
         Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
@@ -110,7 +110,7 @@ class ApplicationUseCaseTest {
                 })
                 .verifyComplete();
 
-        verify(applicationRepository).save(any(Application.class));
+        verify(applicationGateway).save(any(Application.class));
     }
 
     @Test
@@ -157,7 +157,7 @@ class ApplicationUseCaseTest {
         UserRecord userWithWrongRole = new UserRecord("1", "Test", "User", LocalDate.now(), "test@test.com", "123", "300", 1, 50000.0);
         when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(userWithWrongRole));
         // Se añade el mock para que el flujo pase la validación de solicitudes abiertas.
-        when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
 
         // Act
         Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
@@ -174,7 +174,7 @@ class ApplicationUseCaseTest {
         when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
         when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
         when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
-        when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
         Application requestWithInvalidAmount = new Application(null, "", BigDecimal.valueOf(4000), 12, "test@test.com", 1, 1);
 
         // Act
@@ -194,7 +194,7 @@ class ApplicationUseCaseTest {
         when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
 
         // Simulamos que el repositorio encuentra una solicitud abierta para este cliente.
-        lenient().when(applicationRepository.findOpenApplicationsByDocumentId(anyString(), any()))
+        lenient().when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
                 .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1))); // Devolvemos un Flux con un elemento de Application válido
 
         // Act

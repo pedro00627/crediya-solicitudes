@@ -7,7 +7,6 @@ import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.usecase.application.ApplicationUseCase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -17,13 +16,20 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
-public class Handler {
+public class Handler implements IApplicationApi{
     private final IApplicationMapper mapper;
     private final ApplicationUseCase useCase;
     private final Validator validator;
     private final LoggerPort logger;
 
+    public Handler(IApplicationMapper mapper, ApplicationUseCase useCase, Validator validator, LoggerPort logger) {
+        this.mapper = mapper;
+        this.useCase = useCase;
+        this.validator = validator;
+        this.logger = logger;
+    }
+
+    @Override
     public Mono<ServerResponse> createLoanApplication(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ApplicationRequestRecord.class)
                 .doOnNext(this::validateRequest)

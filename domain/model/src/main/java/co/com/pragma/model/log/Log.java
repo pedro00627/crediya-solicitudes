@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-//@NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Log {

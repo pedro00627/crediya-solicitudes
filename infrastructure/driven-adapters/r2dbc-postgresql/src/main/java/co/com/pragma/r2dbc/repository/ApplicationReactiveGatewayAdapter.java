@@ -1,7 +1,7 @@
 package co.com.pragma.r2dbc.repository;
 
 import co.com.pragma.model.application.Application;
-import co.com.pragma.model.application.gateways.ApplicationRepository;
+import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.r2dbc.entity.ApplicationEntity;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.pragma.r2dbc.interfaces.ApplicationReactiveRepository;
@@ -12,13 +12,13 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 
 @Repository
-public class ApplicationReactiveRepositoryAdapter extends ReactiveAdapterOperations<
+public class ApplicationReactiveGatewayAdapter extends ReactiveAdapterOperations<
         Application,
         ApplicationEntity,
         String,
         ApplicationReactiveRepository
-        > implements ApplicationRepository {
-    public ApplicationReactiveRepositoryAdapter(ApplicationReactiveRepository repository, ObjectMapper mapper) {
+        > implements ApplicationGateway {
+    public ApplicationReactiveGatewayAdapter(ApplicationReactiveRepository repository, ObjectMapper mapper) {
         super(repository, mapper, d -> mapper.map(d, Application.class));
     }
 

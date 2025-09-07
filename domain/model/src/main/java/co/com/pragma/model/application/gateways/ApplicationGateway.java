@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-public interface ApplicationRepository {
+public interface ApplicationGateway {
     Mono<Application> save(Application application);
 
     Flux<Application> findOpenApplicationsByDocumentId(String documentId, List<Integer> statusIds);
