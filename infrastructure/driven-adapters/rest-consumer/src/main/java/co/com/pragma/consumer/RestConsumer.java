@@ -1,5 +1,6 @@
 package co.com.pragma.consumer;
 
+import co.com.pragma.api.security.JWTAuthenticationFilter; // Importar JWTAuthenticationFilter
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.model.user.gateways.UserGateway;
@@ -27,17 +28,21 @@ public class RestConsumer implements UserGateway {
     @CircuitBreaker(name = "user-api")
     public Mono<UserRecord> findUserByEmail(String email) {
         logger.info("Consultando servicio de usuarios por email: {}", logger.maskEmail(email));
-        return webClientBuilder.baseUrl(apiUrl).build()
-                .get()
-                .uri(uriBuilder -> uriBuilder.path("/api/v1/usuarios").queryParam("email", email).build())
-                .retrieve()
-                .bodyToMono(UserRecord.class)
-                .doOnError(error -> {
-                    String errorMessage = String.format("Error al consultar el servicio de usuarios por email %s", logger.maskEmail(email));
-                    logger.error(errorMessage, error);
-                })
-                // Se añade el manejo de error para el 404.
-                // Si se recibe un NotFound, se traduce a un Mono vacío, cumpliendo el contrato del Gateway.
-                .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());
+        return Mono.deferContextual(contextView -> {
+            String authToken = contextView.getOrDefault(JWTAuthenticationFilter.AUTH_TOKEN_KEY, "");
+            return webClientBuilder.baseUrl(apiUrl).build()
+                    .get()
+                    .uri(uriBuilder -> uriBuilder.path("/api/v1/usuarios")
+                            .queryParam("email", email)
+                            .build())
+                    .header("Authorization", "Bearer " + authToken) // Usar el token del contexto
+                    .retrieve()
+                    .bodyToMono(UserRecord.class)
+                    .doOnError(error -> {
+                        String errorMessage = String.format("Error al consultar el servicio de usuarios por email %s", logger.maskEmail(email));
+                        logger.error(errorMessage, error);
+                    })
+                    .onErrorResume(WebClientResponseException.NotFound.class, e -> Mono.empty());
+        });
     }
 }

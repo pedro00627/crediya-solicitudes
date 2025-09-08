@@ -16,12 +16,17 @@ import java.util.List;
 
 @Component
 @Order(-2) // Alta prioridad para interceptar errores antes que los manejadores por defecto de Spring
-@RequiredArgsConstructor
 public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
     private final ObjectMapper objectMapper;
     private final List<ExceptionHandlerStrategy> strategies;
     private final LoggerPort logger;
+
+    public GlobalExceptionHandler(ObjectMapper objectMapper, List<ExceptionHandlerStrategy> strategies, LoggerPort logger) {
+        this.objectMapper = objectMapper;
+        this.strategies = strategies;
+        this.logger = logger;
+    }
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {

@@ -1,5 +1,6 @@
 dependencies {
     implementation project(':model')
+    implementation project(':reactive-web') // Add this line
     implementation 'org.springframework:spring-context'
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
