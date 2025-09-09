@@ -9,4 +9,6 @@ public interface LoanTypeGateway {
      * Busca un tipo de préstamo por su ID. La implementación de este método se utilizará para aplicar la caché.
      */
     Mono<LoanType> findById(Integer id);
+
+    Mono<LoanType> findByName(String loanTypeName);
 }
