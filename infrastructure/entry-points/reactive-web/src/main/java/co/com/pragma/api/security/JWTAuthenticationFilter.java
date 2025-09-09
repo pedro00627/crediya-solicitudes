@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Component
 public class JWTAuthenticationFilter implements WebFilter {
 
-    private static final String[] EXCLUDED_PATHS = {"/auth", "/swagger", "/webjars", "/v3/api-docs"};
     public static final String AUTH_TOKEN_KEY = "authToken";
+    private static final String[] EXCLUDED_PATHS = {"/auth", "/swagger", "/webjars", "/v3/api-docs"};
     private final JWTUtil jwtUtil;
 
     public JWTAuthenticationFilter(JWTUtil jwtUtil) {

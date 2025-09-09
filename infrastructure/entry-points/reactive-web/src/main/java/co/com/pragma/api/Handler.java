@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 
 @Component
-public class Handler implements IApplicationApi{
+public class Handler implements IApplicationApi {
     private final IApplicationMapper mapper;
     private final ApplicationUseCase useCase;
     private final Validator validator;

@@ -19,13 +19,18 @@ public abstract class AbstractCachedRepositoryAdapter<T> {
     }
 
     protected abstract String getCacheName();
+
     protected abstract String getEntityNameForLogging(); // For logging purposes (e.g., "TIPO DE PRÉSTAMO", "ESTADO")
+
     protected abstract Class<T> getDomainClass(); // To get the Class<T> for cache.get()
+
     protected abstract Object getEntityId(T entity); // New: Get ID from domain object
+
     protected abstract String getEntityName(T entity); // New: Get name from domain object
 
     // Abstract methods for concrete adapters to implement their specific database fetching logic
     protected abstract Mono<T> fetchByIdFromDatabase(Object id);
+
     protected abstract Mono<T> fetchByNameFromDatabase(String name);
 
     public Mono<T> findById(Object id) {
