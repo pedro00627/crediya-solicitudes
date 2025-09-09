@@ -10,11 +10,14 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class JWTConfig {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
+    private final Long jwtExpiration;
 
-    @Value("${jwt.expiration}")
-    private Long jwtExpiration;
+    public JWTConfig(@Value("${jwt.secret}") String jwtSecret,
+                     @Value("${jwt.expiration}") Long jwtExpiration) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpiration = jwtExpiration;
+    }
 
     public SecretKey secretKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));

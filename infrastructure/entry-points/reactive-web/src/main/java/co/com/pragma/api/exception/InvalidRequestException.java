@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import lombok.Getter;
 
 import java.io.Serial;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,13 +14,17 @@ public class InvalidRequestException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // Se marca como 'transient' para que la serialización de Java ignore este campo,
-    // ya que ConstraintViolation no es necesariamente serializable.
     private final transient Set<? extends ConstraintViolation<?>> violations;
 
     public InvalidRequestException(Set<? extends ConstraintViolation<?>> violations) {
         super(buildMessage(violations));
         this.violations = violations;
+    }
+
+    // Nuevo constructor para manejar mensajes de String
+    public InvalidRequestException(String message) {
+        super(message);
+        this.violations = Collections.emptySet(); // No hay violaciones específicas, se usa un conjunto vacío
     }
 
     private static String buildMessage(Set<? extends ConstraintViolation<?>> violations) {

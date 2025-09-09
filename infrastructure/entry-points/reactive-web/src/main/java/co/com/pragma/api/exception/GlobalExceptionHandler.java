@@ -4,7 +4,6 @@ import co.com.pragma.api.exception.strategy.ExceptionHandlerStrategy;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;

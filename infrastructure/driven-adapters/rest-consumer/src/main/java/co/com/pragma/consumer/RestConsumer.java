@@ -1,6 +1,6 @@
 package co.com.pragma.consumer;
 
-import co.com.pragma.api.security.JWTAuthenticationFilter; // Importar JWTAuthenticationFilter
+import co.com.pragma.api.security.JWTAuthenticationFilter;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.model.user.gateways.UserGateway;

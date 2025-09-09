@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Set;
 
 @Component
-public class Handler implements IApplicationApi{
+public class Handler implements IApplicationApi {
     private final IApplicationMapper mapper;
     private final ApplicationUseCase useCase;
     private final Validator validator;
@@ -33,7 +33,7 @@ public class Handler implements IApplicationApi{
     public Mono<ServerResponse> createLoanApplication(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(ApplicationRequestRecord.class)
                 .doOnNext(this::validateRequest)
-                .map(mapper::toModel)
+                .flatMap(mapper::toModel) // Cambiado de map a flatMap
                 .flatMap(useCase::createLoanApplication)
                 .doOnSuccess(result -> logger.info("Proceso de creación de solicitud finalizado exitosamente para el ID: {}",
                         result.application().getApplicationId()))

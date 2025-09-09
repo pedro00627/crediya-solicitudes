@@ -1,3 +1,9 @@
+configurations.configureEach {
+    // Excluye la implementación de Log4j para estandarizar en Logback, que es el predeterminado de Spring Boot.
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl' // Para Log4j2
+}
+
 dependencies {
     implementation project(':usecase')
     implementation project(':model')
@@ -19,5 +25,8 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
-    testImplementation project(':app-service')
+    // Dependencia para tests de Spring Security
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // testImplementation project(':app-service') // Eliminado para evitar conflictos de contexto en los tests
 }
