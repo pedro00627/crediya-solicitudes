@@ -1,3 +1,9 @@
+configurations.configureEach {
+    // Excluye la implementación de Log4j para estandarizar en Logback, que es el predeterminado de Spring Boot.
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl' // Para Log4j2
+}
+
 dependencies {
     implementation project(':usecase')
     implementation project(':model')
@@ -10,4 +16,17 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:${springdocVersion}"
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    // Spring Security for WebFlux
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT Dependencies
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // Dependencia para tests de Spring Security
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // testImplementation project(':app-service') // Eliminado para evitar conflictos de contexto en los tests
 }
