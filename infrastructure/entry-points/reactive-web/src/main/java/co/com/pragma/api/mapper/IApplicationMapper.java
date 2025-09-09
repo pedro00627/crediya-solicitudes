@@ -1,79 +1,53 @@
-package co.com.pragma.r2dbc.repository;
+package co.com.pragma.api.mapper;
 
-import co.com.pragma.model.log.gateways.LoggerPort;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import co.com.pragma.api.dto.request.ApplicationRequestRecord;
+import co.com.pragma.api.dto.response.ApplicationResponseRecord;
+import co.com.pragma.api.dto.response.ResponseRecord;
+import co.com.pragma.api.dto.response.StatusResponseRecord;
+import co.com.pragma.api.dto.response.LoanTypeResponseRecord;
+import co.com.pragma.model.application.Application;
+import co.com.pragma.model.application.ApplicationCreationResult;
+import co.com.pragma.model.status.Status;
+import co.com.pragma.model.loantype.LoanType;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-import java.util.function.Function;
+@Mapper(componentModel = "spring")
+public abstract class IApplicationMapper {
 
-public abstract class AbstractCachedRepositoryAdapter<T> {
+    @Autowired
+    protected ApplicationMapperHelper helper;
 
-    protected final CacheManager cacheManager;
-    protected final LoggerPort logger;
+    // Mapea el resultado enriquecido del caso de uso al DTO de respuesta final.
+    @Mapping(source = "application", target = "applicationResponseRecord")
+    @Mapping(source = "status", target = "statusResponseRecord")
+    @Mapping(source = "loanType", target = "loanTypeResponseRecord")
+    public abstract ResponseRecord toResponse(ApplicationCreationResult applicationCreationResult);
 
-    AbstractCachedRepositoryAdapter(CacheManager cacheManager, LoggerPort logger) {
-        this.cacheManager = cacheManager;
-        this.logger = logger;
-    }
+    // Mapea el request DTO al modelo de dominio, ignorando los campos que se generan en el backend.
+    @Mapping(target = "applicationId", ignore = true)
+    @Mapping(target = "statusId", ignore = true)
+    @Mapping(target = "documentId", ignore = true)
+    @Mapping(target = "loanTypeId", ignore = true)
+    protected abstract Application toApplication(ApplicationRequestRecord requestRecord);
 
-    protected abstract String getCacheName();
-
-    protected abstract String getEntityNameForLogging(); // For logging purposes (e.g., "TIPO DE PRÉSTAMO", "ESTADO")
-
-    protected abstract Class<T> getDomainClass(); // To get the Class<T> for cache.get()
-
-    protected abstract Object getEntityId(T entity); // New: Get ID from domain object
-
-    protected abstract String getEntityName(T entity); // New: Get name from domain object
-
-    // Abstract methods for concrete adapters to implement their specific database fetching logic
-    protected abstract Mono<T> fetchByIdFromDatabase(Object id);
-
-    protected abstract Mono<T> fetchByNameFromDatabase(String name);
-
-    public Mono<T> findById(Object id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(getCacheName()));
-
-        return Mono.fromCallable(() -> cache.get(id, getDomainClass()))
-                .doOnSuccess(entity -> {
-                    if (entity != null) {
-                        logger.info("==> CACHE HIT. Obteniendo {} desde la caché con ID: {}", getEntityNameForLogging(), id);
-                    }
-                })
-                .switchIfEmpty(getFromDatabaseAndCache(id, cache, this::fetchByIdFromDatabase));
-    }
-
-    public Mono<T> findByName(String name) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(getCacheName()));
-
-        return Mono.fromCallable(() -> cache.get(name, getDomainClass()))
-                .doOnSuccess(entity -> {
-                    if (entity != null) {
-                        logger.info("==> CACHE HIT. Obteniendo {} desde la caché con name: {}", getEntityNameForLogging(), name);
-                    }
-                })
-                .switchIfEmpty(getFromDatabaseAndCache(name, cache, this::fetchByNameFromDatabase));
-    }
-
-    private <K> Mono<T> getFromDatabaseAndCache(K key, Cache cache, Function<K, Mono<T>> databaseFetcher) {
-        logger.info("==> CACHE MISS. Consultando {} desde la BD con {}: {}", getEntityNameForLogging(), (key instanceof Integer || key instanceof String) ? (key instanceof Integer ? "ID" : "name") : "key", key);
-        return databaseFetcher.apply(key)
-                .doOnSuccess(entityFromDb -> {
-                    if (entityFromDb != null) {
-                        // Cache by the key used for fetching
-                        cache.put(key, entityFromDb);
-                        // Cache by ID and Name as well, if available
-                        Object entityId = getEntityId(entityFromDb);
-                        String entityName = getEntityName(entityFromDb);
-                        if (entityId != null && !entityId.equals(key)) {
-                            cache.put(entityId, entityFromDb);
-                        }
-                        if (entityName != null && !entityName.equals(key)) {
-                            cache.put(entityName, entityFromDb);
-                        }
-                    }
+    public Mono<Application> toModel(ApplicationRequestRecord requestRecord) {
+        return Mono.zip(helper.getStatusIdByName(requestRecord.statusName()),
+                        helper.getLoanTypeIdByName(requestRecord.loanTypeName()))
+                .map(tuple -> {
+                    Application application = toApplication(requestRecord);
+                    application.setStatusId(tuple.getT1());
+                    application.setLoanTypeId(tuple.getT2());
+                    return application;
                 });
     }
+
+    // Ayuda a MapStruct a mapear el ID del dominio al ID del DTO de respuesta
+    public abstract ApplicationResponseRecord toApplicationResponseRecord(Application application);
+
+    // Métodos de mapeo para Status y LoanType a sus DTOs de respuesta
+    public abstract StatusResponseRecord toStatusResponseRecord(Status status);
+    public abstract LoanTypeResponseRecord toLoanTypeResponseRecord(LoanType loanType);
 }
