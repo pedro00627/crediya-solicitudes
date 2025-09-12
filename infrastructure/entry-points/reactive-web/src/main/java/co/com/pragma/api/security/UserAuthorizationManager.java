@@ -10,27 +10,28 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Component
 public class UserAuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 
+    // Usamos un Set para una comprobación más limpia y eficiente.
+    private static final Set<String> REQUIRED_ROLES = Set.of(RoleConstants.ADMIN, RoleConstants.ADVISOR);
+
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext object) {
         return authentication
-                .map(auth -> {
-                    if (auth instanceof UsernamePasswordAuthenticationToken) {
-                        UsernamePasswordAuthenticationToken userAuth = (UsernamePasswordAuthenticationToken) auth;
-                        Collection<? extends GrantedAuthority> authorities = userAuth.getAuthorities();
-
-                        // Ejemplo: Permitir acceso si el usuario tiene el rol ADMIN o ADVISOR
-                        boolean hasRequiredRole = authorities.stream()
-                                .anyMatch(a -> a.getAuthority().equals(RoleConstants.ADMIN) || a.getAuthority().equals(RoleConstants.ADVISOR));
-
-                        return new AuthorizationDecision(hasRequiredRole);
-                    }
-                    return new AuthorizationDecision(false);
-                })
+                // 1. Nos aseguramos de que el usuario esté autenticado.
+                .filter(Authentication::isAuthenticated)
+                // 2. Obtenemos un flujo (Flux) de sus roles/autoridades.
+                .flatMapIterable(Authentication::getAuthorities)
+                // 3. Convertimos cada autoridad a su representación en String.
+                .map(GrantedAuthority::getAuthority)
+                // 4. Verificamos si ALGUNO de los roles del usuario está en nuestro Set de roles requeridos.
+                .any(REQUIRED_ROLES::contains)
+                // 5. Convertimos el resultado booleano (true/false) en una decisión de autorización.
+                .map(AuthorizationDecision::new)
+                // 6. Si el usuario no estaba autenticado o no tenía roles, se deniega el acceso por defecto.
                 .defaultIfEmpty(new AuthorizationDecision(false));
     }
 }

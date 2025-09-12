@@ -22,6 +22,23 @@ plugins {
     id 'jacoco'
 }
 
+allprojects {
+    apply plugin: 'java' // Asegura que las configuraciones de Java se apliquen a todos los módulos
+
+    // Asegura que todos los archivos fuente se compilen usando UTF-8
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.springframework.boot' && details.requested.name == 'spring-boot-starter-logging') {
+                details.useTarget "org.springframework.boot:spring-boot-starter-log4j2:${springBootVersion}"
+            }
+        }
+    }
+}
+
 sonar {
     def modules = subprojects.projectDir.collect { "${it.toString().replace(project.projectDir.toString() + "/", "")}" }
     properties {

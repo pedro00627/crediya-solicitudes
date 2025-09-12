@@ -4,18 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.reactivecommons.utils.ObjectMapper;
-import org.springframework.data.domain.Example;
+import org.reactivestreams.Publisher;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Objects;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.reactivestreams.Publisher;
 
 class ReactiveAdapterOperationsTest {
 
@@ -79,7 +76,7 @@ class ReactiveAdapterOperationsTest {
         DummyData data = new DummyData("1", "test");
 
         when(mapper.map(entity, DummyData.class)).thenReturn(data);
-        when(repository.findAll(any(Example.class))).thenReturn(Flux.just(data));
+        when(repository.findAll(any())).thenReturn(Flux.just(data));
 
         StepVerifier.create(operations.findByExample(entity))
                 .expectNext(entity)
@@ -103,69 +100,31 @@ class ReactiveAdapterOperationsTest {
     interface DummyRepository extends ReactiveCrudRepository<DummyData, String>, ReactiveQueryByExampleExecutor<DummyData> {
     }
 
-    static class DummyEntity {
-        private String id;
-        private String name;
-
-        public DummyEntity(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
+    record DummyEntity(String id, String name) {
 
         public static DummyEntity toEntity(DummyData data) {
-            return new DummyEntity(data.getId(), data.getName());
-        }
+                return new DummyEntity(data.id(), data.name());
+            }
 
-        public String getId() {
-            return id;
-        }
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                DummyEntity that = (DummyEntity) o;
+                return id.equals(that.id) && name.equals(that.name);
+            }
 
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            DummyEntity that = (DummyEntity) o;
-            return id.equals(that.id) && name.equals(that.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name);
-        }
     }
 
-    static class DummyData {
-        private String id;
-        private String name;
-
-        public DummyData(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
+    record DummyData(String id, String name) {
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            DummyData that = (DummyData) o;
-            return id.equals(that.id) && name.equals(that.name);
-        }
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                DummyData that = (DummyData) o;
+                return id.equals(that.id) && name.equals(that.name);
+            }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name);
-        }
     }
 }

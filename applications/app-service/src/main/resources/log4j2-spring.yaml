@@ -1,0 +1,33 @@
+Configuration:
+  status: WARN
+  properties:
+    Property:
+      name: LOG_PATH
+      value: ./logs
+
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      JsonTemplateLayout:
+        eventTemplateUri: "classpath:log4j2-template.json"
+    File:
+      name: File
+      fileName: "${LOG_PATH}/log.log"
+      JsonTemplateLayout:
+        eventTemplateUri: "classpath:log4j2-template.json"
+
+  Loggers:
+    Logger:
+      - name: co.com.pragma
+        level: debug
+        includeLocation: true # Activa la recolección de la ubicación del código
+      - name: org.springframework
+        level: warn
+      - name: io.r2dbc
+        level: warn
+    Root:
+      level: warn
+      AppenderRef:
+        - ref: Console
+        - ref: File

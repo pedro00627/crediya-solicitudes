@@ -7,7 +7,10 @@ import co.com.pragma.r2dbc.interfaces.LoanTypeDataRepository;
 import co.com.pragma.r2dbc.mapper.LoanTypeMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Repository
 public class LoanTypeRepositoryAdapter extends AbstractCachedRepositoryAdapter<LoanType> implements LoanTypeGateway {
@@ -57,6 +60,10 @@ public class LoanTypeRepositoryAdapter extends AbstractCachedRepositoryAdapter<L
         return repository.findByName(name)
                 .map(loanTypeMapper::toDomain);
     }
+
+    @Override
+    public Flux<LoanType> findAllByIds(Set<Integer> ids) {
+        return repository.findAllByLoanTypeIdIn(ids).map(loanTypeMapper::toDomain);    }
 
     // Implementación explícita de los métodos de LoanTypeGateway
     @Override
