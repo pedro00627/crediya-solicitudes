@@ -31,7 +31,7 @@ public class ServerWebInputExceptionHandler implements ExceptionHandlerStrategy 
         ServerWebInputException exception = (ServerWebInputException) ex;
 
         // Usamos el LoggerPort inyectado. Nota: se usa .info() porque LoggerPort no define .warn()
-        logger.info("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
+        logger.warn("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
 
         String reason = "El cuerpo de la petición tiene un formato inválido.";
         if (ex.getMessage().contains("LocalDate")) {

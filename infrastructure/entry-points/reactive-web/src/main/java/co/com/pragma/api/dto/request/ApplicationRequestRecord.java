@@ -11,7 +11,6 @@ public record ApplicationRequestRecord(
         int term,
         @Email(message = "Debe ser una dirección de correo electrónico válida")
         String email,
-        @NotNull(message = "El nombre del estado no puede ser nulo")
         String statusName,
         @NotNull(message = "El nombre del tipo de préstamo no puede ser nulo")
         String loanTypeName

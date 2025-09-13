@@ -12,6 +12,11 @@ public class Slf4jLoggerAdapter implements LoggerPort {
     }
 
     @Override
+    public void warn(String message, Object... args) {
+        log.warn(message, args);
+    }
+
+    @Override
     public void debug(String message, Object... args) {
         log.debug(message, args);
     }

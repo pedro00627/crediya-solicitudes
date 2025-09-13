@@ -8,6 +8,8 @@ import co.com.pragma.model.status.gateways.StatusGateway;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Component
 public class ApplicationMapperHelper {
 
@@ -20,26 +22,30 @@ public class ApplicationMapperHelper {
     }
 
     public Mono<Integer> getStatusIdByName(String statusName) {
+        // La validación de nulidad se elimina. La lógica condicional estará en el mapper principal.
         return statusGateway.findByName(statusName)
                 .map(Status::getStatusId)
-                .switchIfEmpty(Mono.error(new InvalidRequestException("Status name not found: " + statusName)));
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Nombre de estado no encontrado: " + statusName)));
     }
 
     public Mono<Integer> getLoanTypeIdByName(String loanTypeName) {
+        if (Objects.isNull(loanTypeName)) {
+            return Mono.error(new InvalidRequestException("El campo 'loanTypeName' no puede ser nulo."));
+        }
         return loanTypeGateway.findByName(loanTypeName)
                 .map(LoanType::getLoanTypeId)
-                .switchIfEmpty(Mono.error(new InvalidRequestException("Loan type name not found: " + loanTypeName)));
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Nombre de tipo de préstamo no encontrado: " + loanTypeName)));
     }
 
     public Mono<String> getStatusNameById(int statusId) {
         return statusGateway.findById(statusId)
                 .map(Status::getName)
-                .switchIfEmpty(Mono.error(new InvalidRequestException("Status ID not found: " + statusId)));
+                .switchIfEmpty(Mono.error(new InvalidRequestException("ID de estado no encontrado: " + statusId)));
     }
 
     public Mono<String> getLoanTypeNameById(int loanTypeId) {
         return loanTypeGateway.findById(loanTypeId)
                 .map(LoanType::getName)
-                .switchIfEmpty(Mono.error(new InvalidRequestException("Loan type ID not found: " + loanTypeId)));
+                .switchIfEmpty(Mono.error(new InvalidRequestException("ID de tipo de préstamo no encontrado: " + loanTypeId)));
     }
 }

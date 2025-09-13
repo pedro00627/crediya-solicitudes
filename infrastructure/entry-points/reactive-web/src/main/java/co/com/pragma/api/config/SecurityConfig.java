@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(PUBLIC_API_PATHS).permitAll()
                         // Reglas de la historia de usuario
-                        .pathMatchers(HttpMethod.POST, "/api/users").hasAnyRole(RoleConstants.ADMIN, RoleConstants.ADVISOR)
-                        .pathMatchers(HttpMethod.POST, "/api/loans").hasRole(RoleConstants.CLIENT)
+                        .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasAnyRole(RoleConstants.ADMIN, RoleConstants.ADVISOR)
+                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitud").hasRole(RoleConstants.CLIENT)
                         // Regla personalizada para obtener usuarios
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios").access(userAuthorizationManager)
                         // Regla para el nuevo endpoint de revisión de solicitudes

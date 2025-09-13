@@ -44,7 +44,7 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
                                 errorWrapper.body());
                         logger.error(errorMessage, ex); // Loguea el stack trace completo para errores del servidor
                     } else {
-                        logger.info("Error de negocio o de cliente en la petición [{} {}]: {}",
+                        logger.warn("Error de negocio o de cliente en la petición [{} {}]: {}",
                                 exchange.getRequest().getMethod(),
                                 exchange.getRequest().getPath(),
                                 errorWrapper.body()); // Para errores 4xx, el cuerpo del error suele ser suficiente
