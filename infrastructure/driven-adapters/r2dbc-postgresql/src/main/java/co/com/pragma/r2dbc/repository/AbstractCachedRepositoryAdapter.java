@@ -58,7 +58,7 @@ public abstract class AbstractCachedRepositoryAdapter<T> {
     }
 
     private <K> Mono<T> getFromDatabaseAndCache(K key, Cache cache, Function<K, Mono<T>> databaseFetcher) {
-        logger.info("==> CACHE MISS. Consultando {} desde la BD con {}: {}", getEntityNameForLogging(), (key instanceof Integer || key instanceof String) ? (key instanceof Integer ? "ID" : "name") : "key", key);
+        logger.info("==> CACHE MISS. Consultando {} desde la BD con {}: {}", getEntityNameForLogging(), getKeyTypeForLogging(key), String.valueOf(key));
         return databaseFetcher.apply(key)
                 .doOnSuccess(entityFromDb -> {
                     if (entityFromDb != null) {
@@ -75,5 +75,15 @@ public abstract class AbstractCachedRepositoryAdapter<T> {
                         }
                     }
                 });
+    }
+
+    private <K> String getKeyTypeForLogging(K key) {
+        if (key instanceof Integer) {
+            return "ID";
+        }
+        if (key instanceof String) {
+            return "name";
+        }
+        return "key";
     }
 }

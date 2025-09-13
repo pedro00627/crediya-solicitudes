@@ -3,6 +3,7 @@ package co.com.pragma.usecase.application;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
+import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.exception.BusinessMessages;
@@ -19,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-public class ApplicationUseCase {
+public class ApplicationUseCase implements CreateLoanApplicationUseCase {
 
     private final LoanTypeGateway loanTypeGateway;
     private final StatusGateway statusGateway;
@@ -41,6 +42,7 @@ public class ApplicationUseCase {
     /**
      * Orquesta la creación de una solicitud de préstamo, validando datos y reglas de negocio.
      */
+    @Override
     public Mono<ApplicationCreationResult> createLoanApplication(Application applicationRequest) {
         logger.info("Iniciando proceso. Email: {}, Request inicial: statusId={}, loanTypeId={}",
                 logger.maskEmail(applicationRequest.getEmail()), applicationRequest.getStatusId(), applicationRequest.getLoanTypeId());

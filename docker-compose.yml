@@ -1,0 +1,94 @@
+services:
+  # --- Base de Datos para el Microservicio de SOLICITUDES ---
+  solicitudes-db:
+    image: postgres:15
+    container_name: crediya-solicitudes-db
+    environment:
+      - POSTGRES_USER=${SOLICITUDES_DB_USER}
+      - POSTGRES_PASSWORD=${SOLICITUDES_DB_PASSWORD}
+      - POSTGRES_DB=${SOLICITUDES_DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - solicitudes-db-data:/var/lib/postgresql/data
+    networks:
+      - crediya-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SOLICITUDES_DB_USER} -d ${SOLICITUDES_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Base de Datos para AUTENTICACION ---
+  autenticacion-db:
+    image: postgres:15
+    container_name: crediya-autenticacion-db
+    environment:
+      - POSTGRES_USER=${AUTH_DB_USER}
+      - POSTGRES_PASSWORD=${AUTH_DB_PASSWORD}
+      - POSTGRES_DB=${AUTH_DB_NAME}
+    ports:
+      - "5434:5432"
+    volumes:
+      - autenticacion-db-data:/var/lib/postgresql/data
+    networks:
+      - crediya-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Microservicio de SOLICITUDES ---
+  solicitudes-app:
+    build:
+      context: ./Solicitudes
+      dockerfile: Dockerfile
+    container_name: crediya-solicitudes-app
+    depends_on:
+      solicitudes-db:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_R2DBC_URL=r2dbc:postgresql://solicitudes-db:5432/${SOLICITUDES_DB_NAME}
+      - SPRING_R2DBC_USERNAME=${SOLICITUDES_DB_USER}
+      - SPRING_R2DBC_PASSWORD=${SOLICITUDES_DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://solicitudes-db:5432/${SOLICITUDES_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${SOLICITUDES_DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${SOLICITUDES_DB_PASSWORD}
+    ports:
+      - "8080:8080" 
+    networks:
+      - crediya-network
+
+  # --- Microservicio de AUTENTICACION ---
+  autenticacion-app:
+    build:
+      context: ./Autenticacion
+      dockerfile: Dockerfile
+    container_name: crediya-autenticacion-app
+    depends_on:
+      autenticacion-db:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_R2DBC_URL=r2dbc:postgresql://autenticacion-db:5432/${AUTH_DB_NAME}
+      - SPRING_R2DBC_USERNAME=${AUTH_DB_USER}
+      - SPRING_R2DBC_PASSWORD=${AUTH_DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://autenticacion-db:5432/${AUTH_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${AUTH_DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${AUTH_DB_PASSWORD}
+    ports:
+      - "8081:8081"
+    networks:
+      - crediya-network
+
+# --- Volúmenes para la persistencia de datos ---
+volumes:
+  solicitudes-db-data:
+  autenticacion-db-data:
+
+# --- Red para la comunicación entre servicios ---
+networks:
+  crediya-network:
+    driver: bridge

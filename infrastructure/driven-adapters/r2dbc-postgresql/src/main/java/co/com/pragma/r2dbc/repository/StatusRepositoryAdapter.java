@@ -7,7 +7,10 @@ import co.com.pragma.r2dbc.interfaces.StatusReactiveRepository;
 import co.com.pragma.r2dbc.mapper.StatusMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Repository
 public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Status> implements StatusGateway {
@@ -48,8 +51,7 @@ public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Sta
 
     @Override
     protected Mono<Status> fetchByIdFromDatabase(Object id) {
-        // Asumiendo que el ID de Status es String en la base de datos
-        return repository.findById(String.valueOf(id))
+        return repository.findById((Integer) id)
                 .map(statusMapper::toDomain);
     }
 
@@ -58,6 +60,10 @@ public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Sta
         return repository.findByName(name)
                 .map(statusMapper::toDomain);
     }
+
+    @Override
+    public Flux<Status> findAllByIds(Set<Integer> ids) {
+        return repository.findAllByStatusIdIn(ids).map(statusMapper::toDomain);    }
 
     // Implementación explícita de los métodos de StatusGateway
     @Override

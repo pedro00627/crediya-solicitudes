@@ -1,36 +1,40 @@
 package co.com.pragma.api.security;
 
-import co.com.pragma.model.security.RoleConstants;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-
+/**
+ * Adaptador que integra la lógica de autorización de negocio con las interfaces de Spring Security.
+ * Esta clase es el único punto que depende directamente de ReactiveAuthorizationManager,
+ * aislando la lógica de negocio de las particularidades del framework.
+ */
 @Component
 public class UserAuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 
+    private final UserAuthorizationLogic authorizationLogic;
+
+    public UserAuthorizationManager() {
+        this.authorizationLogic = new UserAuthorizationLogic();
+    }
+
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext object) {
-        return authentication
-                .map(auth -> {
-                    if (auth instanceof UsernamePasswordAuthenticationToken) {
-                        UsernamePasswordAuthenticationToken userAuth = (UsernamePasswordAuthenticationToken) auth;
-                        Collection<? extends GrantedAuthority> authorities = userAuth.getAuthorities();
+        // Delega la lógica de negocio a la clase pura.
+        return this.authorizationLogic.check(authentication);
+    }
 
-                        // Ejemplo: Permitir acceso si el usuario tiene el rol ADMIN o ADVISOR
-                        boolean hasRequiredRole = authorities.stream()
-                                .anyMatch(a -> a.getAuthority().equals(RoleConstants.ADMIN) || a.getAuthority().equals(RoleConstants.ADVISOR));
+    @Override
+    public Mono<Void> verify(Mono<Authentication> authentication, AuthorizationContext object) {
+        return ReactiveAuthorizationManager.super.verify(authentication, object);
+    }
 
-                        return new AuthorizationDecision(hasRequiredRole);
-                    }
-                    return new AuthorizationDecision(false);
-                })
-                .defaultIfEmpty(new AuthorizationDecision(false));
+    @Override
+    public Mono<AuthorizationResult> authorize(Mono<Authentication> authentication, AuthorizationContext object) {
+        return ReactiveAuthorizationManager.super.authorize(authentication, object);
     }
 }

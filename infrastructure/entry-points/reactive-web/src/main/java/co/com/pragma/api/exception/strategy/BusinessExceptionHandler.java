@@ -29,7 +29,7 @@ public class BusinessExceptionHandler implements ExceptionHandlerStrategy {
     public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
         HttpStatus status = HttpStatus.CONFLICT;
         // LoggerPort no tiene el nivel WARN, se usa INFO para registrar el evento.
-        logger.info("Violación de regla de negocio para la petición [{}]: {}", exchange.getRequest().getPath(), ex.getMessage());
+        logger.warn("Violación de regla de negocio para la petición [{}]: {}", exchange.getRequest().getPath(), ex.getMessage());
 
         ErrorBody body = new ErrorBody(status.value(), "Business Rule Violation", ex.getMessage(), null);
 

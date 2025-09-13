@@ -18,16 +18,32 @@
     "$resolver": "mdc",
     "key": "spanId"
   },
-  "logger": {
+  "loggerName": {
     "$resolver": "logger",
-    "field": "name"
+    "field": "name",
+    "abbreviator": "pattern{1.}"
   },
-  "thread": {
+  "threadName": {
     "$resolver": "thread",
     "field": "name"
+  },
+  "source": {
+    "$resolver": "source"
+  },
+  "mdc": {
+    "$resolver": "mdc"
   },
   "message": {
     "$resolver": "message",
     "stringified": true
+  },
+  "exceptionStackTrace": {
+    "$resolver": "exception",
+    "field": "stackTrace",
+    "stringified": true,
+    "truncation": {
+      "maxStringLength": 1500,
+      "suffix": "..."
+    }
   }
 }

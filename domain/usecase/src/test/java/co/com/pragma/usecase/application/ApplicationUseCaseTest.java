@@ -3,8 +3,10 @@ package co.com.pragma.usecase.application;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
+import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
+import co.com.pragma.model.exception.BusinessMessages;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
 import co.com.pragma.model.log.gateways.LoggerPort;
@@ -55,7 +57,7 @@ class ApplicationUseCaseTest {
     @Mock
 
     // La unidad bajo prueba ya no se inyecta, se construye manualmente.
-    private ApplicationUseCase applicationUseCase;
+    private CreateLoanApplicationUseCase applicationUseCase;
 
     private Application applicationRequest;
     private LoanType validLoanType;
@@ -194,15 +196,16 @@ class ApplicationUseCaseTest {
         when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
 
         // Simulamos que el repositorio encuentra una solicitud abierta para este cliente.
-        lenient().when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
-                .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1))); // Devolvemos un Flux con un elemento de Application válido
+        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
+                .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1)));
 
         // Act
         Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
 
         // Assert
         StepVerifier.create(result)
-                .expectErrorMessage("El usuario (identificado por email y/o documento) ya tiene una solicitud de préstamo activa.")
+                .expectErrorMatches(throwable -> throwable instanceof BusinessException &&
+                        throwable.getMessage().equals(BusinessMessages.USER_HAS_ACTIVE_APPLICATION))
                 .verify();
     }
 }

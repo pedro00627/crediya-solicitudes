@@ -54,3 +54,13 @@ concretas de las dependencias declaradas. Adem�s inicia la aplicaci�n (es el
 encontraremos la funci�n �public static void main(String[] args)�.
 
 **Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+
+## DEV
+
+Variables de entorno requeridas
+
+´´´
+DB_SECRET={db_password};
+DB_USER={db_user};
+JWT_SECRET={jwt_256_token}
+´´´
