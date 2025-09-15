@@ -1,7 +1,6 @@
 package co.com.pragma.api.security;
 
 import org.springframework.security.authorization.AuthorizationDecision;
-import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
@@ -26,15 +25,5 @@ public class UserAuthorizationManager implements ReactiveAuthorizationManager<Au
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext object) {
         // Delega la lógica de negocio a la clase pura.
         return this.authorizationLogic.check(authentication);
-    }
-
-    @Override
-    public Mono<Void> verify(Mono<Authentication> authentication, AuthorizationContext object) {
-        return ReactiveAuthorizationManager.super.verify(authentication, object);
-    }
-
-    @Override
-    public Mono<AuthorizationResult> authorize(Mono<Authentication> authentication, AuthorizationContext object) {
-        return ReactiveAuthorizationManager.super.authorize(authentication, object);
     }
 }

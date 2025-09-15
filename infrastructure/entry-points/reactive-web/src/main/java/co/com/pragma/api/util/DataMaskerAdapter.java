@@ -1,6 +1,6 @@
 package co.com.pragma.api.util;
 
-import co.com.pragma.commonutils.LogHelper;
+import com.github.pedro00627.commonlogging.LogHelper;
 import co.com.pragma.model.security.gateways.DataMaskerPort;
 import org.springframework.stereotype.Component;
 

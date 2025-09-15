@@ -1,9 +1,9 @@
 package co.com.pragma.api;
 
+import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.dto.request.ApplicationRequestRecord;
 import co.com.pragma.api.mapper.IApplicationRequestMapper;
 import co.com.pragma.api.mapper.IApplicationResponseHandler;
-import co.com.pragma.model.application.ApplicationReviewDTO;
 import co.com.pragma.api.dto.response.ApplicationResponseRecord;
 import co.com.pragma.api.dto.response.LoanTypeResponseRecord;
 import co.com.pragma.api.dto.response.ResponseRecord;
@@ -11,12 +11,12 @@ import co.com.pragma.api.dto.response.StatusResponseRecord;
 import co.com.pragma.api.mapper.ApplicationMapperAdapter;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
-import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.status.Status;
 import co.com.pragma.model.user.UserRecord;
-import co.com.pragma.model.application.gateways.FindApplicationsForReviewUseCase;
+import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
+import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,7 +134,7 @@ import java.util.UUID;
         Mockito.when(findApplicationsForReviewUseCase.findApplicationsForReview(Mockito.any()))
                 .thenReturn(Flux.just(mockApplication));
 
-        Mockito.when(mapperAdapter.toEnrichedReviewDTOs(Mockito.any(Flux.class)))
+        Mockito.when(mapperAdapter.toEnrichedReviewDTOs(Mockito.any())) // Changed from Mockito.any(Flux.class)
                 .thenReturn(Mono.just(List.of(mockReviewDTO)));
 
         webTestClient

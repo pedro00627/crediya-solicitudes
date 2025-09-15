@@ -92,7 +92,7 @@ app:
     terminal-status-ids: [ 2, 3, 4 ] # 2=APROBADO, 3=RECHAZADO, 4=CANCELADO
 
 logging:
-  config: classpath:log4j2-spring.yaml
+  config: classpath:profiles/web-service.yaml
 
 jwt:
   secret: ${JWT_SECRET}

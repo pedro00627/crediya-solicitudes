@@ -1,5 +1,4 @@
-/*
-package co.com.pragma.model.application.gateways;
+package co.com.pragma.usecase.application;
 
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.common.PageRequest;
@@ -10,4 +9,3 @@ public interface FindApplicationsForReviewUseCase {
     Flux<Application> findApplicationsForReview(PageRequest pageRequest);
     Mono<Long> countApplicationsForReview();
 }
-*/

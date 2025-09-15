@@ -3,7 +3,6 @@ package co.com.pragma.usecase.application;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
-import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.exception.BusinessMessages;
@@ -36,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

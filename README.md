@@ -1,66 +1,75 @@
-# Proyecto Base Implementando Clean Architecture
+# Microservicio de Solicitudes - CrediYa
 
-## Antes de Iniciar
+Microservicio responsable de la gestión del ciclo completo de solicitudes de préstamos en el ecosistema CrediYa.
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando
-con los componentes core de negocio (dominio) y por �ltimo el inicio y configuraci�n de la aplicaci�n.
+## Funcionalidades
 
-Lee el
-art�culo [Clean Architecture � Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+- Registro de solicitudes de préstamo
+- Evaluación automatizada de capacidad de endeudamiento
+- Gestión de estados de solicitudes
+- Listado de solicitudes para revisión manual
+- Validación de tipos de préstamo
 
-# Arquitectura
+## Tecnologías
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+- **Spring Boot 3.5.4** con WebFlux (Reactivo)
+- **R2DBC** para acceso reactivo a PostgreSQL
+- **MapStruct** para mapeo de objetos
+- **Swagger/OpenAPI** para documentación de API
 
-## Domain
+## API Endpoints
 
-Es el m�dulo m�s interno de la arquitectura, pertenece a la capa del dominio y encapsula la l�gica y reglas del negocio
-mediante modelos y entidades del dominio.
+- `POST /api/v1/solicitud` - Registrar nueva solicitud de préstamo
+- `GET /api/v1/solicitud` - Listar solicitudes (requiere rol Asesor)
+- `GET /api/v1/solicitud/{id}` - Obtener solicitud específica
+- `PUT /api/v1/solicitud/{id}/estado` - Actualizar estado de solicitud
 
-## Usecases
+## Variables de Entorno
 
-Este m�dulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define l�gica de
-aplicaci�n y reacciona a las invocaciones desde el m�dulo de entry points, orquestando los flujos hacia el m�dulo de
-entities.
+```env
+SPRING_R2DBC_URL=r2dbc:postgresql://solicitudes-db:5432/{db_name}
+SPRING_R2DBC_USERNAME={db_user}
+SPRING_R2DBC_PASSWORD={db_password}
+```
 
-## Infrastructure
+## Docker
 
-### Helpers
+El servicio se ejecuta en el puerto **8080** y se conecta a la base de datos `solicitudes-db` en el puerto 5433.
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+## Historia de Usuario Implementada
 
-Estas utilidades no est�n arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-gen�ricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patr�n de
-dise�o [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+### HU1: Registrar una solicitud de préstamo
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+**Como cliente**, quiero enviar mi solicitud de préstamo con la información necesaria (monto y plazo deseado) para que CrediYa pueda evaluarla.
 
-### Driven Adapters
+#### Criterios de Aceptación
+- ✅ Se puede enviar una solicitud de crédito con información del cliente y detalles del préstamo
+- ✅ La solicitud se registra automáticamente con estado "Pendiente de revisión"
+- ✅ El sistema valida que el tipo de préstamo seleccionado exista
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+### HU2: Listado de solicitudes para revisión manual
 
-### Entry Points
+**Como Asesor**, quiero ver un listado de todas las solicitudes que necesitan mi revisión para tomar la decisión final.
 
-Los entry points representan los puntos de entrada de la aplicaci�n o el inicio de los flujos de negocio.
+#### Criterios de Aceptación
+- ✅ Lista paginada y filtrable de solicitudes pendientes
+- ✅ Retorna información completa de solicitudes (monto, plazo, email, nombre, tipo_préstamo, tasa_interés, estado_solicitud, salario_base, deuda_total_mensual)
 
-## Application
+## Arquitectura Clean Architecture
 
-Este m�dulo es el m�s externo de la arquitectura, es el encargado de ensamblar los distintos m�dulos, resolver las
-dependencias y crear los beans de los casos de use (UseCases) de forma autom�tica, inyectando en �stos instancias
-concretas de las dependencias declaradas. Adem�s inicia la aplicaci�n (es el �nico m�dulo del proyecto donde
-encontraremos la funci�n �public static void main(String[] args)�.
+El proyecto implementa Clean Architecture con los siguientes módulos:
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+### Domain
+Encapsula la lógica y reglas del negocio para el procesamiento de solicitudes.
 
-## DEV
+### Usecases
+Implementa los casos de uso para registro, evaluación y gestión de solicitudes.
 
-Variables de entorno requeridas
+### Infrastructure
+- **Driven Adapters**: Conexión a PostgreSQL con R2DBC
+- **Entry Points**: APIs REST para gestión de solicitudes
 
-´´´
-DB_SECRET={db_password};
-DB_USER={db_user};
-JWT_SECRET={jwt_256_token}
-´´´
+### Application
+Ensambla los módulos, resuelve dependencias y configura la aplicación.
+
+**Los beans de los casos de uso se disponibilizan automáticamente gracias a '@ComponentScan'.**

@@ -3,7 +3,6 @@ package co.com.pragma.usecase.application;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationStatus;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
-import co.com.pragma.model.application.gateways.FindApplicationsForReviewUseCase;
 import co.com.pragma.model.common.PageRequest;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import lombok.RequiredArgsConstructor;

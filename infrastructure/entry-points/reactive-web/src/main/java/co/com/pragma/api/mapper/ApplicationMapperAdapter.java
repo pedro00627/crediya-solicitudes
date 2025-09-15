@@ -1,7 +1,7 @@
 package co.com.pragma.api.mapper;
 
 import co.com.pragma.model.application.Application;
-import co.com.pragma.model.application.ApplicationReviewDTO;
+import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
 import co.com.pragma.model.status.Status;

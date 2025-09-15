@@ -335,5 +335,7 @@ gradle-app.setting
 *.hprof
 build-cache
 .idea
-
 .env
+
+# Security: Gradle properties with sensitive data
+gradle.properties

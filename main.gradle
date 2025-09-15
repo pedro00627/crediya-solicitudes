@@ -5,6 +5,14 @@ allprojects {
         mavenCentral()
         maven { url = "https://repo.spring.io/snapshot" }
         maven { url = "https://repo.spring.io/milestone" }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/pedro00627/common-logging")
+            credentials {
+                username = project.findProperty('githubActor') ?: System.getenv("GITHUB_ACTOR") ?: ""
+                password = project.findProperty('githubToken') ?: System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
     }
 }
 
@@ -17,33 +25,40 @@ subprojects {
     compileJava.dependsOn validateStructure
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-
 
     test {
         useJUnitPlatform()
     }
 
+    // ✅ DEPENDENCIAS PARA TODOS LOS MÓDULOS (incluye Lombok)
     dependencies {
         implementation 'io.projectreactor:reactor-core'
-        implementation 'io.projectreactor.addons:reactor-extra'
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
-        testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
-
-        testImplementation 'io.projectreactor:reactor-test'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        // ✅ LOMBOK EN TODOS LOS MÓDULOS (porque lombok=true en gradle.properties)
         compileOnly "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'io.projectreactor:reactor-test'
+    }
+
+    if (!project.path.contains(':model') && !project.path.contains(':usecase')) {
+        dependencies {
+            implementation 'io.projectreactor.addons:reactor-extra'
+            implementation "com.github.pedro00627:common-logging:${loggingVersion}"
+            testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
+        }
     }
 
     tasks.withType(Test).configureEach {
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)) {
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
             jvmArgs += [
                     "-XX:+AllowRedefinitionToAddDeleteMethods"
             ]
@@ -63,7 +78,6 @@ subprojects {
         exportLineCoverage = true
         useClasspathFile = true
         timestampedReports = false
-        //mutators = ['STRONGER', 'DEFAULTS']
         fileExtensionsToFilter.addAll('xml', 'orbit')
         junit5PluginVersion = '1.2.2'
         failWhenNoMutations = false
@@ -71,8 +85,6 @@ subprojects {
     }
 
     jacocoTestReport {
-        // Se elimina la dependencia de 'pitest' para que no se ejecute en cada build.
-        // Esto hace el build más rápido y resiliente. Pitest se puede ejecutar manualmente.
         dependsOn test
         reports {
             xml.setRequired true
@@ -81,7 +93,6 @@ subprojects {
             html.setOutputLocation layout.buildDirectory.dir("reports/jacocoHtml")
         }
     }
-
 }
 
 jacoco {
@@ -90,8 +101,6 @@ jacoco {
 }
 
 tasks.register('jacocoMergedReport', JacocoReport) {
-    // Se elimina la dependencia de pitestReportAggregate para que esta tarea
-    // genere únicamente el reporte de cobertura de JaCoCo.
     dependsOn = [test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
@@ -137,5 +146,5 @@ pitestReportAggregate {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '8.14.3'
+    gradleVersion = '9.0.0'
 }

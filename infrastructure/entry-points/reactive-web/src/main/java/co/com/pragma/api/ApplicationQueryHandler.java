@@ -1,8 +1,8 @@
 package co.com.pragma.api;
 
-import co.com.pragma.model.application.ApplicationReviewDTO;
+import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.mapper.ApplicationMapperAdapter;
-import co.com.pragma.model.application.gateways.FindApplicationsForReviewUseCase;
+import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import co.com.pragma.model.common.PageRequest;
 import co.com.pragma.model.common.PagedResponse;
 import co.com.pragma.model.log.gateways.LoggerPort;

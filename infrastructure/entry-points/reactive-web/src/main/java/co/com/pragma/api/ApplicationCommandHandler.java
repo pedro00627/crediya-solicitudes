@@ -4,7 +4,7 @@ import co.com.pragma.api.dto.request.ApplicationRequestRecord;
 import co.com.pragma.api.exception.InvalidRequestException;
 import co.com.pragma.api.mapper.IApplicationRequestMapper;
 import co.com.pragma.api.mapper.IApplicationResponseHandler;
-import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
+import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
