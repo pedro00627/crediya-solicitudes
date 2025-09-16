@@ -11,7 +11,7 @@ buildscript {
         reactiveCommonsMapperVersion = '0.1.0'
         archunitVersion = '1.4.1'
         jjwtVersion = '0.12.6'
-        loggingVersion = '1.0.7'
+        loggingVersion = '1.0.16'
     }
 }
 
@@ -21,6 +21,7 @@ plugins {
     id 'info.solidsoft.pitest' version "${pitestVersion}" apply false
     id 'org.sonarqube' version "${sonarVersion}"
     id 'jacoco'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 allprojects {
@@ -48,16 +49,9 @@ allprojects {
     }
 }
 
-// Apply configurations only to non-domain modules
-subprojects {
-    if (!project.path.contains(':model') && !project.path.contains(':usecase')) {
-        configurations.configureEach {
-            resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'org.springframework.boot' && details.requested.name == 'spring-boot-starter-logging') {
-                    details.useTarget "org.springframework.boot:spring-boot-starter-log4j2:${springBootVersion}"
-                }
-            }
-        }
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
     }
 }
 

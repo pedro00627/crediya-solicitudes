@@ -1,5 +1,6 @@
 package co.com.pragma.config;
 
+import co.com.pragma.commonutils.LogHelperAdapter;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
@@ -12,6 +13,7 @@ import co.com.pragma.usecase.application.ApplicationUseCase;
 import co.com.pragma.usecase.application.FindApplicationsForReviewUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class UseCasesConfig {
@@ -39,5 +41,12 @@ public class UseCasesConfig {
             ApplicationGateway applicationGateway,
             LoggerPort logger) {
         return new FindApplicationsForReviewUseCaseImpl(applicationGateway, logger);
+    }
+
+
+    @Bean
+    @Primary // Asegura que este bean sea el preferido si hay múltiples implementaciones de LoggerPort
+    public LoggerPort loggerPort() {
+        return new LogHelperAdapter();
     }
 }

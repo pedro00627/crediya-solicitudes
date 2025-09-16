@@ -6,6 +6,7 @@ dependencies {
     implementation project(':reactive-web')
     implementation project(':usecase')
     implementation project(':model')
+    implementation project(':commonutils')
 
     testImplementation 'com.tngtech.archunit:archunit:1.4.1'
 

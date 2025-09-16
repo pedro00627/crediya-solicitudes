@@ -9,7 +9,7 @@ COPY src ./src
 
 RUN ./gradlew bootJar --no-daemon -x test
 
-FROM gcr.io/distroless/java21-debian11
+FROM gcr.io/distroless/java21-debian12
 WORKDIR /app
 
 COPY --from=build /home/gradle/src/applications/app-service/build/libs/CrediYa.jar ./app.jar
