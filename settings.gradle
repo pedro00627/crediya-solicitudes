@@ -29,9 +29,8 @@ project(':reactive-web').projectDir = file('./infrastructure/entry-points/reacti
 include ':r2dbc-postgresql'
 project(':r2dbc-postgresql').projectDir = file('./infrastructure/driven-adapters/r2dbc-postgresql')
 
+include ':rest-consumer'
+project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')
 
 include ':commonutils'
 project(':commonutils').projectDir = file('./infrastructure/shared-infrastructure/commonutils')
-
-include ':rest-consumer'
-project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/rest-consumer')

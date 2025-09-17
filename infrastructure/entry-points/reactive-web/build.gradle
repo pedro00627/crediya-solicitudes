@@ -19,7 +19,7 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
     // Dependencia a la librería common-logging
-    implementation "com.github.pedro00627:common-logging:${loggingVersion}"
+    implementation "co.com.pragma:crediya-common-starter:${commonVersion}"
     // Dependencia para tests de Spring Security
     testImplementation 'org.springframework.security:spring-security-test'
 }

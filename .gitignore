@@ -339,3 +339,4 @@ build-cache
 
 # Security: Gradle properties with sensitive data
 gradle.properties
+gradle.properties
