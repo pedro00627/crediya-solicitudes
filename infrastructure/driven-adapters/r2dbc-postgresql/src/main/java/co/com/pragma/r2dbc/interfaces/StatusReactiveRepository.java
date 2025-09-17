@@ -10,5 +10,6 @@ import java.util.Collection;
 
 public interface StatusReactiveRepository extends ReactiveCrudRepository<StatusEntity, Integer>, ReactiveQueryByExampleExecutor<StatusEntity> {
     Mono<StatusEntity> findByName(String name);
+
     Flux<StatusEntity> findAllByStatusIdIn(Collection<Integer> ids);
 }

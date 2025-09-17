@@ -1,5 +1,6 @@
 package co.com.pragma.api.mapper;
 
+import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.dto.request.ApplicationRequestRecord;
 import co.com.pragma.api.dto.response.ApplicationResponseRecord;
 import co.com.pragma.api.dto.response.LoanTypeResponseRecord;
@@ -7,7 +8,6 @@ import co.com.pragma.api.dto.response.ResponseRecord;
 import co.com.pragma.api.dto.response.StatusResponseRecord;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
-import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.model.loantype.LoanType;
 import co.com.pragma.model.status.Status;
 import org.mapstruct.Mapper;

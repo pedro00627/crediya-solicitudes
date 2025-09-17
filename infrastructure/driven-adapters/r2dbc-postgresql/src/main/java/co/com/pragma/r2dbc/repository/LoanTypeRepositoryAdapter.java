@@ -63,7 +63,8 @@ public class LoanTypeRepositoryAdapter extends AbstractCachedRepositoryAdapter<L
 
     @Override
     public Flux<LoanType> findAllByIds(Set<Integer> ids) {
-        return repository.findAllByLoanTypeIdIn(ids).map(loanTypeMapper::toDomain);    }
+        return repository.findAllByLoanTypeIdIn(ids).map(loanTypeMapper::toDomain);
+    }
 
     // Implementación explícita de los métodos de LoanTypeGateway
     @Override

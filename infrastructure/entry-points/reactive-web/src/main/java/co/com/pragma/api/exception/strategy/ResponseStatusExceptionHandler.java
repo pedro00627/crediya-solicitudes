@@ -12,7 +12,8 @@ import reactor.core.publisher.Mono;
 
 // Se le da un nombre único al bean para evitar conflictos con el que provee Spring Boot por defecto.
 @Component("customResponseStatusExceptionHandler")
-@Order(Ordered.HIGHEST_PRECEDENCE + 10) // Alta prioridad para manejar estas excepciones específicas antes que el DefaultHandler
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
+// Alta prioridad para manejar estas excepciones específicas antes que el DefaultHandler
 public class ResponseStatusExceptionHandler implements ExceptionHandlerStrategy {
 
     @Override

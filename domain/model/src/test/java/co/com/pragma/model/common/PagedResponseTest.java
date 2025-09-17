@@ -57,7 +57,7 @@ class PagedResponseTest {
         PagedResponse<String> response = PagedResponse.of(content, 0, 0, 10);
 
         // Assert
-        assertThat(response.getTotalPages()).isEqualTo(0);
+        assertThat(response.getTotalPages()).isZero();
     }
 
     @Test

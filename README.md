@@ -40,9 +40,11 @@ El servicio se ejecuta en el puerto **8080** y se conecta a la base de datos `so
 
 ### HU1: Registrar una solicitud de préstamo
 
-**Como cliente**, quiero enviar mi solicitud de préstamo con la información necesaria (monto y plazo deseado) para que CrediYa pueda evaluarla.
+**Como cliente**, quiero enviar mi solicitud de préstamo con la información necesaria (monto y plazo deseado) para que
+CrediYa pueda evaluarla.
 
 #### Criterios de Aceptación
+
 - ✅ Se puede enviar una solicitud de crédito con información del cliente y detalles del préstamo
 - ✅ La solicitud se registra automáticamente con estado "Pendiente de revisión"
 - ✅ El sistema valida que el tipo de préstamo seleccionado exista
@@ -52,24 +54,30 @@ El servicio se ejecuta en el puerto **8080** y se conecta a la base de datos `so
 **Como Asesor**, quiero ver un listado de todas las solicitudes que necesitan mi revisión para tomar la decisión final.
 
 #### Criterios de Aceptación
+
 - ✅ Lista paginada y filtrable de solicitudes pendientes
-- ✅ Retorna información completa de solicitudes (monto, plazo, email, nombre, tipo_préstamo, tasa_interés, estado_solicitud, salario_base, deuda_total_mensual)
+- ✅ Retorna información completa de solicitudes (monto, plazo, email, nombre, tipo_préstamo, tasa_interés,
+  estado_solicitud, salario_base, deuda_total_mensual)
 
 ## Arquitectura Clean Architecture
 
 El proyecto implementa Clean Architecture con los siguientes módulos:
 
 ### Domain
+
 Encapsula la lógica y reglas del negocio para el procesamiento de solicitudes.
 
 ### Usecases
+
 Implementa los casos de uso para registro, evaluación y gestión de solicitudes.
 
 ### Infrastructure
+
 - **Driven Adapters**: Conexión a PostgreSQL con R2DBC
 - **Entry Points**: APIs REST para gestión de solicitudes
 
 ### Application
+
 Ensambla los módulos, resuelve dependencias y configura la aplicación.
 
 **Los beans de los casos de uso se disponibilizan automáticamente gracias a '@ComponentScan'.**

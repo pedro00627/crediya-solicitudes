@@ -11,7 +11,7 @@ public interface ApplicationGateway {
     Mono<Application> save(Application application);
 
     Flux<Application> findOpenApplicationsByDocumentId(String documentId, List<Integer> statusIds);
-    
+
     Flux<Application> findByStatusIn(List<String> statuses, PageRequest pageRequest);
 
     Mono<Long> countByStatusIn(List<String> statuses);

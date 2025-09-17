@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface FindApplicationsForReviewUseCase {
     Flux<Application> findApplicationsForReview(PageRequest pageRequest);
+
     Mono<Long> countApplicationsForReview();
 }

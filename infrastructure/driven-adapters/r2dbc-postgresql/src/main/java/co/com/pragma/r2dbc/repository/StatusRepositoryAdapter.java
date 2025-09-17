@@ -63,7 +63,8 @@ public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Sta
 
     @Override
     public Flux<Status> findAllByIds(Set<Integer> ids) {
-        return repository.findAllByStatusIdIn(ids).map(statusMapper::toDomain);    }
+        return repository.findAllByStatusIdIn(ids).map(statusMapper::toDomain);
+    }
 
     // Implementación explícita de los métodos de StatusGateway
     @Override

@@ -1,7 +1,7 @@
 package co.com.pragma.api.mapper;
 
-import co.com.pragma.model.application.Application;
 import co.com.pragma.api.dto.ApplicationReviewDTO;
+import co.com.pragma.model.application.Application;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

@@ -13,6 +13,7 @@ public class ApplicationValidator {
 
     }
 
+
     /**
      * Valida que el rol de un usuario corresponda al ID de rol requerido.
      * Lanza una BusinessException si el rol no es el correcto.
@@ -35,4 +36,6 @@ public class ApplicationValidator {
             throw new BusinessException("El monto solicitado está fuera de los límites para el tipo de préstamo seleccionado.");
         }
     }
+
+
 }

@@ -1,9 +1,9 @@
 package co.com.pragma.consumer;
 
-import co.com.pragma.api.security.JWTAuthenticationFilter;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.model.user.gateways.UserGateway;
+import co.com.pragma.security.api.JWTAuthenticationFilter;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class RestConsumer implements UserGateway {
                     .uri(uriBuilder -> uriBuilder.path("/api/v1/usuarios")
                             .queryParam("email", email)
                             .build())
-                    .header("Authorization", "Bearer " + authToken) // Usar el token del contexto
+                    .header("Authorization", authToken) // Usar el token del contexto
                     .retrieve()
                     .bodyToMono(UserRecord.class)
                     .doOnError(error -> {

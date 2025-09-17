@@ -2,10 +2,10 @@ package co.com.pragma.api;
 
 import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.mapper.ApplicationMapperAdapter;
-import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import co.com.pragma.model.common.PageRequest;
 import co.com.pragma.model.common.PagedResponse;
 import co.com.pragma.model.log.gateways.LoggerPort;
+import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;

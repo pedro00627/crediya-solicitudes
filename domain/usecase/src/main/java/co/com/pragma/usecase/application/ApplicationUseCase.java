@@ -1,7 +1,7 @@
 package co.com.pragma.usecase.application;
 
-import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.Application;
+import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;

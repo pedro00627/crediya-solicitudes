@@ -10,14 +10,6 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-    // Spring Security for WebFlux
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    // JWT Dependencies
-    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
     // Dependencia a la librería common-logging
     implementation "co.com.pragma:crediya-common-starter:${commonVersion}"
     // Dependencia para tests de Spring Security

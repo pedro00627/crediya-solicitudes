@@ -4,8 +4,9 @@ import co.com.pragma.api.dto.request.ApplicationRequestRecord;
 import co.com.pragma.api.exception.InvalidRequestException;
 import co.com.pragma.api.mapper.IApplicationRequestMapper;
 import co.com.pragma.api.mapper.IApplicationResponseHandler;
-import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
 import co.com.pragma.model.log.gateways.LoggerPort;
+import co.com.pragma.security.api.JWTAuthenticationFilter;
+import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.security.Principal;
 import java.util.Set;
@@ -45,7 +47,8 @@ public class ApplicationCommandHandler implements IApplicationCommandApi {
                 }))
                 .doOnNext(result -> // 3. Efecto secundario (log) solo si hay un resultado exitoso
                         logger.info("Proceso de creación de solicitud finalizado exitosamente para el ID: {}", result.application().getApplicationId())
-                )
+                ).contextWrite(Context.of(JWTAuthenticationFilter.AUTH_TOKEN_KEY, serverRequest.headers().header(JWTAuthenticationFilter.AUTH_TOKEN_KEY).getFirst()))
+
                 .flatMap(responseHandler::buildCreationResponse);
     }
 

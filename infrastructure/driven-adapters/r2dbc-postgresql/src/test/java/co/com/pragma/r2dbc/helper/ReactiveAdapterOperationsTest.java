@@ -103,28 +103,28 @@ class ReactiveAdapterOperationsTest {
     record DummyEntity(String id, String name) {
 
         public static DummyEntity toEntity(DummyData data) {
-                return new DummyEntity(data.id(), data.name());
-            }
+            return new DummyEntity(data.id(), data.name());
+        }
 
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                DummyEntity that = (DummyEntity) o;
-                return id.equals(that.id) && name.equals(that.name);
-            }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DummyEntity that = (DummyEntity) o;
+            return id.equals(that.id) && name.equals(that.name);
+        }
 
     }
 
     record DummyData(String id, String name) {
 
         @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                DummyData that = (DummyData) o;
-                return id.equals(that.id) && name.equals(that.name);
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DummyData that = (DummyData) o;
+            return id.equals(that.id) && name.equals(that.name);
+        }
 
     }
 }

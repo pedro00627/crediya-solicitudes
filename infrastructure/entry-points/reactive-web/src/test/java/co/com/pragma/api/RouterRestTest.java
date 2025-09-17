@@ -2,13 +2,9 @@ package co.com.pragma.api;
 
 import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.dto.request.ApplicationRequestRecord;
+import co.com.pragma.api.mapper.ApplicationMapperAdapter;
 import co.com.pragma.api.mapper.IApplicationRequestMapper;
 import co.com.pragma.api.mapper.IApplicationResponseHandler;
-import co.com.pragma.api.dto.response.ApplicationResponseRecord;
-import co.com.pragma.api.dto.response.LoanTypeResponseRecord;
-import co.com.pragma.api.dto.response.ResponseRecord;
-import co.com.pragma.api.dto.response.StatusResponseRecord;
-import co.com.pragma.api.mapper.ApplicationMapperAdapter;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.loantype.LoanType;
@@ -27,15 +23,14 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +45,8 @@ import java.util.UUID;
 @WebFluxTest(excludeAutoConfiguration = {
         SecurityAutoConfiguration.class
 })
-@Import({RouterRest.class, ApplicationCommandHandler.class, ApplicationQueryHandler.class, RouterRestTest.TestApplication.class})class RouterRestTest {
+@Import({RouterRest.class, ApplicationCommandHandler.class, ApplicationQueryHandler.class, RouterRestTest.TestApplication.class})
+class RouterRestTest {
 
     private final WebTestClient webTestClient;
     @MockitoBean

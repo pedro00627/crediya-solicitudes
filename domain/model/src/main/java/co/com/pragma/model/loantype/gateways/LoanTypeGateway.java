@@ -17,6 +17,7 @@ public interface LoanTypeGateway {
 
     /**
      * Busca todos los tipos de préstamo que coincidan con los IDs proporcionados.
+     *
      * @param ids un Set de IDs de tipo de préstamo a buscar.
      * @return un Flux de los tipos de préstamo encontrados.
      */
