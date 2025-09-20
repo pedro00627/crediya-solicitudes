@@ -60,8 +60,6 @@ logging:
     org.springframework.security: debug
     reactor.core: debug
     org.springframework.web.server: debug
-cors:
-  allowed-origins: "http://localhost:4200,http://localhost:8080"
 
 adapters:
   restconsumer:
