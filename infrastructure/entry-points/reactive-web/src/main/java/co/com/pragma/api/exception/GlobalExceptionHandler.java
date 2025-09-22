@@ -21,16 +21,16 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
     private final List<ExceptionHandlerStrategy> strategies;
     private final LoggerPort logger;
 
-    public GlobalExceptionHandler(ObjectMapper objectMapper, List<ExceptionHandlerStrategy> strategies, LoggerPort logger) {
+    public GlobalExceptionHandler(final ObjectMapper objectMapper, final List<ExceptionHandlerStrategy> strategies, final LoggerPort logger) {
         this.objectMapper = objectMapper;
         this.strategies = strategies;
         this.logger = logger;
     }
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+    public Mono<Void> handle(final ServerWebExchange exchange, final Throwable ex) {
         // Encuentra la primera estrategia que soporta este tipo de excepción
-        return this.strategies.stream()
+        return strategies.stream()
                 .filter(strategy -> strategy.supports(ex.getClass()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No se encontró una estrategia de manejo de excepciones por defecto."))
@@ -38,13 +38,13 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
                 .flatMap(errorWrapper -> {
                     // Loguea el error de forma centralizada y estructurada
                     if (errorWrapper.status().is5xxServerError()) {
-                        String errorMessage = String.format("Error no controlado en la petición [%s %s]: %s",
+                        final String errorMessage = String.format("Error no controlado en la petición [%s %s]: %s",
                                 exchange.getRequest().getMethod(),
                                 exchange.getRequest().getPath(),
                                 errorWrapper.body());
-                        logger.error(errorMessage, ex); // Loguea el stack trace completo para errores del servidor
+                        this.logger.error(errorMessage, ex); // Loguea el stack trace completo para errores del servidor
                     } else {
-                        logger.warn("Error de negocio o de cliente en la petición [{} {}]: {}",
+                        this.logger.warn("Error de negocio o de cliente en la petición [{} {}]: {}",
                                 exchange.getRequest().getMethod(),
                                 exchange.getRequest().getPath(),
                                 errorWrapper.body()); // Para errores 4xx, el cuerpo del error suele ser suficiente
@@ -56,11 +56,11 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
                     // Escribe el cuerpo del error en la respuesta
                     try {
-                        byte[] bytes = objectMapper.writeValueAsBytes(errorWrapper.body());
+                        final byte[] bytes = this.objectMapper.writeValueAsBytes(errorWrapper.body());
                         return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                                 .bufferFactory().wrap(bytes)));
-                    } catch (JsonProcessingException e) {
-                        logger.error("Error escribiendo la respuesta JSON de error", e);
+                    } catch (final JsonProcessingException e) {
+                        this.logger.error("Error escribiendo la respuesta JSON de error", e);
                         return Mono.empty(); // Se retorna Mono.empty() para no propagar un segundo error
                     }
                 });

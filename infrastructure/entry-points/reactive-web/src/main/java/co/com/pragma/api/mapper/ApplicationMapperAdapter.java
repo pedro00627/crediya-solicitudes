@@ -27,43 +27,43 @@ public class ApplicationMapperAdapter {
     private final StatusGateway statusGateway;
     private final LoanTypeGateway loanTypeGateway;
 
-    public Mono<ApplicationReviewDTO> toEnrichedReviewDTO(Application application) {
+    public Mono<ApplicationReviewDTO> toEnrichedReviewDTO(final Application application) {
         // Este método se mantiene por si se necesita en otro lugar, pero ya no se usa para la paginación.
-        Mono<String> statusNameMono = statusGateway.findById(application.getStatusId()).map(Status::getName).defaultIfEmpty(UNKNOWN_VALUE);
-        Mono<LoanType> loanTypeMono = loanTypeGateway.findById(application.getLoanTypeId());
+        final Mono<String> statusNameMono = this.statusGateway.findById(application.getStatusId()).map(Status::getName).defaultIfEmpty(ApplicationMapperAdapter.UNKNOWN_VALUE);
+        final Mono<LoanType> loanTypeMono = this.loanTypeGateway.findById(application.getLoanTypeId());
 
         return Mono.zip(statusNameMono, loanTypeMono)
-                .map(tuple -> delegate.toReviewDTO(application, tuple.getT1(), tuple.getT2()))
-                .defaultIfEmpty(delegate.toReviewDTO(application, UNKNOWN_VALUE, null));
+                .map(tuple -> this.delegate.toReviewDTO(application, tuple.getT1(), tuple.getT2()))
+                .defaultIfEmpty(this.delegate.toReviewDTO(application, ApplicationMapperAdapter.UNKNOWN_VALUE, null));
     }
 
-    public Mono<List<ApplicationReviewDTO>> toEnrichedReviewDTOs(Flux<Application> applications) {
+    public Mono<List<ApplicationReviewDTO>> toEnrichedReviewDTOs(final Flux<Application> applications) {
         return applications.collectList().flatMap(appList -> {
             if (appList.isEmpty()) {
                 return Mono.just(Collections.emptyList());
             }
 
             // 1. Recolectar todos los IDs únicos
-            Set<Integer> statusIds = appList.stream().map(Application::getStatusId).collect(Collectors.toSet());
-            Set<Integer> loanTypeIds = appList.stream().map(Application::getLoanTypeId).collect(Collectors.toSet());
+            final Set<Integer> statusIds = appList.stream().map(Application::getStatusId).collect(Collectors.toSet());
+            final Set<Integer> loanTypeIds = appList.stream().map(Application::getLoanTypeId).collect(Collectors.toSet());
 
             // 2. Realizar dos consultas en lote (bulk)
-            Mono<Map<Integer, String>> statusMapMono = statusGateway.findAllByIds(statusIds)
+            final Mono<Map<Integer, String>> statusMapMono = this.statusGateway.findAllByIds(statusIds)
                     .collectMap(Status::getStatusId, Status::getName); // Asume que el modelo Status tiene getStatusId()
-            Mono<Map<Integer, LoanType>> loanTypeMapMono = loanTypeGateway.findAllByIds(loanTypeIds)
+            final Mono<Map<Integer, LoanType>> loanTypeMapMono = this.loanTypeGateway.findAllByIds(loanTypeIds)
                     .collectMap(LoanType::getLoanTypeId, loanType -> loanType); // Asume que el modelo LoanType tiene getLoanTypeId()
 
             // 3. Combinar los resultados y mapear en memoria
             return Mono.zip(statusMapMono, loanTypeMapMono)
                     .map(tuple -> {
-                        Map<Integer, String> statusMap = tuple.getT1();
-                        Map<Integer, LoanType> loanTypeMap = tuple.getT2();
+                        final Map<Integer, String> statusMap = tuple.getT1();
+                        final Map<Integer, LoanType> loanTypeMap = tuple.getT2();
 
                         return appList.stream()
                                 .map(app -> {
-                                    String statusName = statusMap.getOrDefault(app.getStatusId(), UNKNOWN_VALUE);
-                                    LoanType loanType = loanTypeMap.get(app.getLoanTypeId());
-                                    return delegate.toReviewDTO(app, statusName, loanType);
+                                    final String statusName = statusMap.getOrDefault(app.getStatusId(), ApplicationMapperAdapter.UNKNOWN_VALUE);
+                                    final LoanType loanType = loanTypeMap.get(app.getLoanTypeId());
+                                    return this.delegate.toReviewDTO(app, statusName, loanType);
                                 })
                                 .collect(Collectors.toList());
                     });

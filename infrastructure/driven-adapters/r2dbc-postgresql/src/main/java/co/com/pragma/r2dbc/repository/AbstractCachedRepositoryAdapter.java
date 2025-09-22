@@ -13,7 +13,7 @@ public abstract class AbstractCachedRepositoryAdapter<T> {
     protected final CacheManager cacheManager;
     protected final LoggerPort logger;
 
-    AbstractCachedRepositoryAdapter(CacheManager cacheManager, LoggerPort logger) {
+    AbstractCachedRepositoryAdapter(final CacheManager cacheManager, final LoggerPort logger) {
         this.cacheManager = cacheManager;
         this.logger = logger;
     }
@@ -33,51 +33,51 @@ public abstract class AbstractCachedRepositoryAdapter<T> {
 
     protected abstract Mono<T> fetchByNameFromDatabase(String name);
 
-    public Mono<T> findById(Object id) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(getCacheName()));
+    public Mono<T> findById(final Object id) {
+        final Cache cache = Objects.requireNonNull(this.cacheManager.getCache(this.getCacheName()));
 
-        return Mono.fromCallable(() -> cache.get(id, getDomainClass()))
+        return Mono.fromCallable(() -> cache.get(id, this.getDomainClass()))
                 .doOnSuccess(entity -> {
-                    if (entity != null) {
-                        logger.info("==> CACHE HIT. Obteniendo {} desde la caché con ID: {}", getEntityNameForLogging(), id);
+                    if (null != entity) {
+                        this.logger.info("==> CACHE HIT. Obteniendo {} desde la caché con ID: {}", this.getEntityNameForLogging(), id);
                     }
                 })
-                .switchIfEmpty(getFromDatabaseAndCache(id, cache, this::fetchByIdFromDatabase));
+                .switchIfEmpty(this.getFromDatabaseAndCache(id, cache, this::fetchByIdFromDatabase));
     }
 
-    public Mono<T> findByName(String name) {
-        Cache cache = Objects.requireNonNull(cacheManager.getCache(getCacheName()));
+    public Mono<T> findByName(final String name) {
+        final Cache cache = Objects.requireNonNull(this.cacheManager.getCache(this.getCacheName()));
 
-        return Mono.fromCallable(() -> cache.get(name, getDomainClass()))
+        return Mono.fromCallable(() -> cache.get(name, this.getDomainClass()))
                 .doOnSuccess(entity -> {
-                    if (entity != null) {
-                        logger.info("==> CACHE HIT. Obteniendo {} desde la caché con name: {}", getEntityNameForLogging(), name);
+                    if (null != entity) {
+                        this.logger.info("==> CACHE HIT. Obteniendo {} desde la caché con name: {}", this.getEntityNameForLogging(), name);
                     }
                 })
-                .switchIfEmpty(getFromDatabaseAndCache(name, cache, this::fetchByNameFromDatabase));
+                .switchIfEmpty(this.getFromDatabaseAndCache(name, cache, this::fetchByNameFromDatabase));
     }
 
-    private <K> Mono<T> getFromDatabaseAndCache(K key, Cache cache, Function<K, Mono<T>> databaseFetcher) {
-        logger.info("==> CACHE MISS. Consultando {} desde la BD con {}: {}", getEntityNameForLogging(), getKeyTypeForLogging(key), String.valueOf(key));
+    private <K> Mono<T> getFromDatabaseAndCache(final K key, final Cache cache, final Function<K, Mono<T>> databaseFetcher) {
+        this.logger.info("==> CACHE MISS. Consultando {} desde la BD con {}: {}", this.getEntityNameForLogging(), this.getKeyTypeForLogging(key), String.valueOf(key));
         return databaseFetcher.apply(key)
                 .doOnSuccess(entityFromDb -> {
-                    if (entityFromDb != null) {
+                    if (null != entityFromDb) {
                         // Cache by the key used for fetching
                         cache.put(key, entityFromDb);
                         // Cache by ID and Name as well, if available
-                        Object entityId = getEntityId(entityFromDb);
-                        String entityName = getEntityName(entityFromDb);
-                        if (entityId != null && !entityId.equals(key)) {
+                        final Object entityId = this.getEntityId(entityFromDb);
+                        final String entityName = this.getEntityName(entityFromDb);
+                        if (null != entityId && !entityId.equals(key)) {
                             cache.put(entityId, entityFromDb);
                         }
-                        if (entityName != null && !entityName.equals(key)) {
+                        if (null != entityName && !entityName.equals(key)) {
                             cache.put(entityName, entityFromDb);
                         }
                     }
                 });
     }
 
-    private <K> String getKeyTypeForLogging(K key) {
+    private <K> String getKeyTypeForLogging(final K key) {
         if (key instanceof Integer) {
             return "ID";
         }

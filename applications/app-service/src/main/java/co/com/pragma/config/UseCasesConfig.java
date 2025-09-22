@@ -20,12 +20,12 @@ public class UseCasesConfig {
 
     @Bean
     public CreateLoanApplicationUseCase applicationUseCase(
-            LoanTypeGateway loanTypeGateway,
-            StatusGateway statusGateway,
-            UserGateway userGateway,
-            ApplicationGateway applicationGateway,
-            LoggerPort logger,
-            AppRules appRules) {
+            final LoanTypeGateway loanTypeGateway,
+            final StatusGateway statusGateway,
+            final UserGateway userGateway,
+            final ApplicationGateway applicationGateway,
+            final LoggerPort logger,
+            final AppRules appRules) {
         return new ApplicationUseCase(
                 loanTypeGateway,
                 statusGateway,
@@ -38,8 +38,8 @@ public class UseCasesConfig {
 
     @Bean
     public FindApplicationsForReviewUseCase findApplicationsForReviewUseCase(
-            ApplicationGateway applicationGateway,
-            LoggerPort logger) {
+            final ApplicationGateway applicationGateway,
+            final LoggerPort logger) {
         return new FindApplicationsForReviewUseCaseImpl(applicationGateway, logger);
     }
 

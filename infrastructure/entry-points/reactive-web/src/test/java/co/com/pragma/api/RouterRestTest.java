@@ -16,6 +16,7 @@ import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -42,9 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(excludeAutoConfiguration = {
-        SecurityAutoConfiguration.class
-})
+@WebFluxTest(excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import({RouterRest.class, ApplicationCommandHandler.class, ApplicationQueryHandler.class, RouterRestTest.TestApplication.class})
 class RouterRestTest {
 
@@ -64,15 +63,15 @@ class RouterRestTest {
     @MockitoBean
     private LoggerPort loggerPort;
 
-    public RouterRestTest(@Autowired WebTestClient webTestClient) {
+    public RouterRestTest(@Autowired final WebTestClient webTestClient) {
         this.webTestClient = webTestClient;
     }
 
     @Test
     void shouldCreateLoanApplicationSuccessfully() {
-        String userEmail = "test@test.com";
+        final String userEmail = "test@test.com";
 
-        var requestRecord = new ApplicationRequestRecord(
+        final var requestRecord = new ApplicationRequestRecord(
                 null,
                 BigDecimal.TEN,
                 12,
@@ -81,31 +80,31 @@ class RouterRestTest {
                 "LIBRE INVERSION"
         );
 
-        var mockApplication = new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, userEmail, 1, 1);
-        var mockLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true);
-        var mockStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
-        var mockUser = new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), userEmail, "123456", "3001234567", 2, 50000.0);
+        final var mockApplication = new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, userEmail, 1, 1);
+        final var mockLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true);
+        final var mockStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
+        final var mockUser = new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), userEmail, "123456", "3001234567", 2, 50000.0);
 
-        var mockUseCaseResponse = new ApplicationCreationResult(
+        final var mockUseCaseResponse = new ApplicationCreationResult(
                 mockApplication,
                 mockLoanType,
                 mockStatus,
                 mockUser
         );
 
-        Mockito.when(validator.validate(Mockito.any(ApplicationRequestRecord.class)))
+        Mockito.when(this.validator.validate(ArgumentMatchers.any(ApplicationRequestRecord.class)))
                 .thenReturn(Collections.emptySet());
 
-        Mockito.when(requestMapper.toModel(Mockito.any(ApplicationRequestRecord.class)))
+        Mockito.when(this.requestMapper.toModel(ArgumentMatchers.any(ApplicationRequestRecord.class)))
                 .thenReturn(Mono.just(mockApplication));
 
-        Mockito.when(useCase.createLoanApplication(Mockito.any(Application.class)))
+        Mockito.when(this.useCase.createLoanApplication(ArgumentMatchers.any(Application.class)))
                 .thenAnswer(invocation -> Mono.just(mockUseCaseResponse));
 
-        Mockito.when(responseHandler.buildCreationResponse(Mockito.any(ApplicationCreationResult.class)))
+        Mockito.when(this.responseHandler.buildCreationResponse(ArgumentMatchers.any(ApplicationCreationResult.class)))
                 .thenAnswer(invocation -> ServerResponse.created(URI.create("/api/v1/solicitud")).build());
 
-        webTestClient
+        this.webTestClient
                 .mutateWith(SecurityMockServerConfigurers.mockUser(userEmail))
                 .post()
                 .uri("/api/v1/solicitud")
@@ -117,23 +116,23 @@ class RouterRestTest {
 
     @Test
     void shouldGetApplicationsForReviewSuccessfully() {
-        var mockApplication = new Application(UUID.randomUUID(), "12345", BigDecimal.valueOf(5000), 24, "review@test.com", 1, 1);
-        var mockReviewDTO = ApplicationReviewDTO.builder()
+        final var mockApplication = new Application(UUID.randomUUID(), "12345", BigDecimal.valueOf(5000), 24, "review@test.com", 1, 1);
+        final var mockReviewDTO = ApplicationReviewDTO.builder()
                 .email("review@test.com")
                 .amount(BigDecimal.valueOf(5000))
                 .applicationStatus("Pendiente de revisión")
                 .loanType("LIBRE INVERSION")
                 .build();
 
-        Mockito.when(findApplicationsForReviewUseCase.countApplicationsForReview())
+        Mockito.when(this.findApplicationsForReviewUseCase.countApplicationsForReview())
                 .thenReturn(Mono.just(1L));
-        Mockito.when(findApplicationsForReviewUseCase.findApplicationsForReview(Mockito.any()))
+        Mockito.when(this.findApplicationsForReviewUseCase.findApplicationsForReview(ArgumentMatchers.any()))
                 .thenReturn(Flux.just(mockApplication));
 
-        Mockito.when(mapperAdapter.toEnrichedReviewDTOs(Mockito.any())) // Changed from Mockito.any(Flux.class)
+        Mockito.when(this.mapperAdapter.toEnrichedReviewDTOs(ArgumentMatchers.any())) // Changed from Mockito.any(Flux.class)
                 .thenReturn(Mono.just(List.of(mockReviewDTO)));
 
-        webTestClient
+        this.webTestClient
                 .get()
                 .uri("/api/v1/solicitud?page=0&size=1")
                 .exchange()
@@ -150,7 +149,7 @@ class RouterRestTest {
     @SpringBootConfiguration
     static class TestApplication {
         @Bean
-        public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        public SecurityWebFilterChain springSecurityFilterChain(final ServerHttpSecurity http) {
             // Deshabilitar CSRF para las pruebas, que es la causa del 403 FORBIDDEN en los POST
             return http
                     .csrf(ServerHttpSecurity.CsrfSpec::disable)

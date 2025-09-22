@@ -34,7 +34,7 @@ SPRING_R2DBC_PASSWORD={db_password}
 
 ## Docker
 
-El servicio se ejecuta en el puerto **8080** y se conecta a la base de datos `solicitudes-db` en el puerto 5433.
+El servicio se ejecuta en el puerto **8081** y se conecta a la base de datos `solicitudes-db` en el puerto 5432.
 
 ## Historia de Usuario Implementada
 

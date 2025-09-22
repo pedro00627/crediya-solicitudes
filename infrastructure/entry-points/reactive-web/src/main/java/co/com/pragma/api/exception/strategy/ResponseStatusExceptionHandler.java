@@ -17,20 +17,20 @@ import reactor.core.publisher.Mono;
 public class ResponseStatusExceptionHandler implements ExceptionHandlerStrategy {
 
     @Override
-    public boolean supports(Class<? extends Throwable> type) {
+    public boolean supports(final Class<? extends Throwable> type) {
         // Esta estrategia es responsable de todas las excepciones ResponseStatusException y sus subclases.
         return ResponseStatusException.class.isAssignableFrom(type);
     }
 
     @Override
-    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
-        ResponseStatusException exception = (ResponseStatusException) ex;
-        HttpStatus status = (HttpStatus) exception.getStatusCode();
+    public Mono<ErrorResponseWrapper> handle(final Throwable ex, final ServerWebExchange exchange) {
+        final ResponseStatusException exception = (ResponseStatusException) ex;
+        final HttpStatus status = (HttpStatus) exception.getStatusCode();
 
         // Usamos el 'reason' de la excepción, que es el mensaje que le pasamos al construirla.
-        String message = exception.getReason();
+        final String message = exception.getReason();
 
-        ErrorBody body = new ErrorBody(status.value(), status.getReasonPhrase(), message, null);
+        final ErrorBody body = new ErrorBody(status.value(), status.getReasonPhrase(), message, null);
         return Mono.just(new ErrorResponseWrapper(status, body));
     }
 }

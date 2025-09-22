@@ -17,13 +17,13 @@ public class PagedResponseDTO<T> {
     private long totalItems;
     private int totalPages;
 
-    public static <T> PagedResponseDTO<T> of(List<T> content, int currentPage, long totalItems, int pageSize) {
-        if (pageSize <= 0) {
+    public static <T> PagedResponseDTO<T> of(final List<T> content, final int currentPage, final long totalItems, final int pageSize) {
+        if (0 >= pageSize) {
             throw new IllegalArgumentException("Page size must be greater than zero.");
         }
         // El cálculo de totalPages se encapsula aquí.
         // Math.ceil maneja correctamente el caso de totalItems = 0.
-        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        final int totalPages = (int) Math.ceil((double) totalItems / pageSize);
         return new PagedResponseDTO<>(content, currentPage, totalItems, totalPages);
     }
 }

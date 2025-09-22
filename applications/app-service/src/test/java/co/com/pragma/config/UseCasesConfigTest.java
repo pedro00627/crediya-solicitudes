@@ -36,7 +36,7 @@ class UseCasesConfigTest {
     void applicationUseCaseShouldBeCreated() {
         // La prueba ahora simplemente verifica que el contexto de Spring pudo
         // crear el bean 'applicationUseCase' inyectando todos los mocks.
-        assertNotNull(applicationUseCase);
+        assertNotNull(this.applicationUseCase);
     }
 
     /**

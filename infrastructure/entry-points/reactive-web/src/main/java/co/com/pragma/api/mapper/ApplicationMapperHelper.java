@@ -16,35 +16,35 @@ public class ApplicationMapperHelper {
     private final StatusGateway statusGateway;
     private final LoanTypeGateway loanTypeGateway;
 
-    public ApplicationMapperHelper(StatusGateway statusGateway, LoanTypeGateway loanTypeGateway) {
+    public ApplicationMapperHelper(final StatusGateway statusGateway, final LoanTypeGateway loanTypeGateway) {
         this.statusGateway = statusGateway;
         this.loanTypeGateway = loanTypeGateway;
     }
 
-    public Mono<Integer> getStatusIdByName(String statusName) {
+    public Mono<Integer> getStatusIdByName(final String statusName) {
         // La validación de nulidad se elimina. La lógica condicional estará en el mapper principal.
-        return statusGateway.findByName(statusName)
+        return this.statusGateway.findByName(statusName)
                 .map(Status::getStatusId)
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Nombre de estado no encontrado: " + statusName)));
     }
 
-    public Mono<Integer> getLoanTypeIdByName(String loanTypeName) {
+    public Mono<Integer> getLoanTypeIdByName(final String loanTypeName) {
         if (Objects.isNull(loanTypeName)) {
             return Mono.error(new InvalidRequestException("El campo 'loanTypeName' no puede ser nulo."));
         }
-        return loanTypeGateway.findByName(loanTypeName)
+        return this.loanTypeGateway.findByName(loanTypeName)
                 .map(LoanType::getLoanTypeId)
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Nombre de tipo de préstamo no encontrado: " + loanTypeName)));
     }
 
-    public Mono<String> getStatusNameById(int statusId) {
-        return statusGateway.findById(statusId)
+    public Mono<String> getStatusNameById(final int statusId) {
+        return this.statusGateway.findById(statusId)
                 .map(Status::getName)
                 .switchIfEmpty(Mono.error(new InvalidRequestException("ID de estado no encontrado: " + statusId)));
     }
 
-    public Mono<String> getLoanTypeNameById(int loanTypeId) {
-        return loanTypeGateway.findById(loanTypeId)
+    public Mono<String> getLoanTypeNameById(final int loanTypeId) {
+        return this.loanTypeGateway.findById(loanTypeId)
                 .map(LoanType::getName)
                 .switchIfEmpty(Mono.error(new InvalidRequestException("ID de tipo de préstamo no encontrado: " + loanTypeId)));
     }

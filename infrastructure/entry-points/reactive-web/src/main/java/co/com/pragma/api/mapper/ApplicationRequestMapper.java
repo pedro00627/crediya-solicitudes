@@ -15,20 +15,20 @@ public class ApplicationRequestMapper implements IApplicationRequestMapper {
     private final ApplicationMapperHelper helper;
 
     @Override
-    public Mono<Application> toModel(ApplicationRequestRecord requestRecord) {
+    public Mono<Application> toModel(final ApplicationRequestRecord requestRecord) {
 
         // Crea un Mono para el statusId que maneja la nulidad de forma reactiva.
-        Mono<Integer> statusIdMono = Mono.justOrEmpty(requestRecord.statusName())
-                .flatMap(helper::getStatusIdByName)
+        final Mono<Integer> statusIdMono = Mono.justOrEmpty(requestRecord.statusName())
+                .flatMap(this.helper::getStatusIdByName)
                 .defaultIfEmpty(ApplicationStatus.PENDING_REVIEW_ID);
 
         // Crea un Mono para el loanTypeId, que es obligatorio.
-        Mono<Integer> loanTypeIdMono = helper.getLoanTypeIdByName(requestRecord.loanTypeName());
+        final Mono<Integer> loanTypeIdMono = this.helper.getLoanTypeIdByName(requestRecord.loanTypeName());
 
         // Combina ambos Monos. Esto es seguro porque statusIdMono siempre emite un valor.
         return Mono.zip(statusIdMono, loanTypeIdMono)
                 .map(tuple -> {
-                    Application application = mapperDelegate.toApplication(requestRecord);
+                    final Application application = this.mapperDelegate.toApplication(requestRecord);
                     application.setStatusId(tuple.getT1());
                     application.setLoanTypeId(tuple.getT2());
                     return application;

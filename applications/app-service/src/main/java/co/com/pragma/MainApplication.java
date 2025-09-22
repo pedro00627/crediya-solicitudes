@@ -8,9 +8,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-@EnableConfigurationProperties({AppRulesProperties.class})
+@EnableConfigurationProperties(AppRulesProperties.class)
 public class MainApplication {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(MainApplication.class, args);
     }
 }

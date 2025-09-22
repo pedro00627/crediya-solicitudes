@@ -39,35 +39,35 @@ class ApplicationReactiveRepositoryAdapterTest {
     @BeforeEach
     void setUp() {
         // Arrange: Datos de prueba consistentes
-        UUID id = UUID.randomUUID();
-        applicationModel = new Application(id, "", BigDecimal.TEN, 12, "test@test.com", 1, 1);
+        final UUID id = UUID.randomUUID();
+        this.applicationModel = new Application(id, "", BigDecimal.TEN, 12, "test@test.com", 1, 1);
 
         // El objeto de entidad ahora es un reflejo realista del modelo
-        applicationEntity = new ApplicationEntity();
-        applicationEntity.setApplicationId(id);
-        applicationEntity.setAmount(BigDecimal.TEN);
-        applicationEntity.setTerm(12);
-        applicationEntity.setEmail("test@test.com");
-        applicationEntity.setStatusId(1);
-        applicationEntity.setLoanTypeId(1);
+        this.applicationEntity = new ApplicationEntity();
+        this.applicationEntity.setApplicationId(id);
+        this.applicationEntity.setAmount(BigDecimal.TEN);
+        this.applicationEntity.setTerm(12);
+        this.applicationEntity.setEmail("test@test.com");
+        this.applicationEntity.setStatusId(1);
+        this.applicationEntity.setLoanTypeId(1);
     }
 
     @Test
     @DisplayName("Debe guardar una solicitud y retornarla exitosamente")
     void shouldSaveApplicationSuccessfully() {
         // Arrange: Configurar los mocks para el flujo de guardado
-        when(mapper.map(applicationModel, ApplicationEntity.class)).thenReturn(applicationEntity);
-        when(repository.save(applicationEntity)).thenReturn(Mono.just(applicationEntity));
-        when(mapper.map(applicationEntity, Application.class)).thenReturn(applicationModel);
+        when(this.mapper.map(this.applicationModel, ApplicationEntity.class)).thenReturn(this.applicationEntity);
+        when(this.repository.save(this.applicationEntity)).thenReturn(Mono.just(this.applicationEntity));
+        when(this.mapper.map(this.applicationEntity, Application.class)).thenReturn(this.applicationModel);
 
         // Act: Llamar al método que queremos probar
-        Mono<Application> result = adapter.save(applicationModel);
+        final Mono<Application> result = this.adapter.save(this.applicationModel);
 
         // Assert: Verificar que el resultado es el esperado
         StepVerifier.create(result)
                 .assertNext(savedApp -> {
-                    assertEquals(applicationModel.getApplicationId(), savedApp.getApplicationId());
-                    assertEquals(applicationModel.getEmail(), savedApp.getEmail());
+                    assertEquals(this.applicationModel.getApplicationId(), savedApp.getApplicationId());
+                    assertEquals(this.applicationModel.getEmail(), savedApp.getEmail());
                 })
                 .verifyComplete();
     }

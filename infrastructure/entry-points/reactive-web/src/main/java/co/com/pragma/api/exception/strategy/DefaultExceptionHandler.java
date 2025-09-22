@@ -18,17 +18,17 @@ public class DefaultExceptionHandler implements ExceptionHandlerStrategy {
     }
 
     @Override
-    public boolean supports(Class<? extends Throwable> type) {
+    public boolean supports(final Class<? extends Throwable> type) {
         return true; // Atrapa todos los errores que los otros no atraparon
     }
 
     @Override
-    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+    public Mono<ErrorResponseWrapper> handle(final Throwable ex, final ServerWebExchange exchange) {
+        final HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        String responseMessage = "Ocurrió un error inesperado. Detalle: " + ex.getMessage();
+        final String responseMessage = "Ocurrió un error inesperado. Detalle: " + ex.getMessage();
 
-        ErrorBody body = new ErrorBody(status.value(), "Internal Server Error", responseMessage, null);
+        final ErrorBody body = new ErrorBody(status.value(), "Internal Server Error", responseMessage, null);
         return Mono.just(new ErrorResponseWrapper(status, body));
     }
 }

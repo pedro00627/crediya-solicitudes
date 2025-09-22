@@ -24,17 +24,17 @@ public class FindApplicationsForReviewUseCaseImpl implements FindApplicationsFor
     private final LoggerPort logger;
 
     @Override
-    public Flux<Application> findApplicationsForReview(PageRequest pageRequest) {
-        logger.info("Iniciando búsqueda de solicitudes para revisión. Página: {}, Tamaño: {}",
+    public Flux<Application> findApplicationsForReview(final PageRequest pageRequest) {
+        this.logger.info("Iniciando búsqueda de solicitudes para revisión. Página: {}, Tamaño: {}",
                 pageRequest.page(), pageRequest.size());
 
-        return applicationGateway.findByStatusIn(REVIEW_STATUSES, pageRequest)
-                .doOnComplete(() -> logger.info("Búsqueda de solicitudes para revisión completada."));
+        return this.applicationGateway.findByStatusIn(FindApplicationsForReviewUseCaseImpl.REVIEW_STATUSES, pageRequest)
+                .doOnComplete(() -> this.logger.info("Búsqueda de solicitudes para revisión completada."));
     }
 
     @Override
     public Mono<Long> countApplicationsForReview() {
-        logger.info("Contando el total de solicitudes para revisión.");
-        return applicationGateway.countByStatusIn(REVIEW_STATUSES);
+        this.logger.info("Contando el total de solicitudes para revisión.");
+        return this.applicationGateway.countByStatusIn(FindApplicationsForReviewUseCaseImpl.REVIEW_STATUSES);
     }
 }

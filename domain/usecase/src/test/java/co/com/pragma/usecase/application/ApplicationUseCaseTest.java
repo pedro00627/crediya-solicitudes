@@ -66,23 +66,23 @@ class ApplicationUseCaseTest {
     @BeforeEach
     void setUp() {
         // --- Valores de Reglas de Negocio (Hardcoded para la prueba) ---
-        AppRules appRules = new AppRules(2, 1, List.of(2, 3, 4));
+        final AppRules appRules = new AppRules(2, 1, List.of(2, 3, 4));
 
         // --- Se instancia la clase bajo prueba manualmente ---
-        applicationUseCase = new ApplicationUseCase(
-                loanTypeGateway,
-                statusGateway,
-                userGateway,
-                applicationGateway,
-                loggerPort,
+        this.applicationUseCase = new ApplicationUseCase(
+                this.loanTypeGateway,
+                this.statusGateway,
+                this.userGateway,
+                this.applicationGateway,
+                this.loggerPort,
                 appRules
         );
 
         // --- Objetos de Dominio Válidos ---
-        applicationRequest = new Application(null, "", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1);
-        validLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.valueOf(5000), BigDecimal.valueOf(20000), BigDecimal.valueOf(0.05), true);
-        validUser = new UserRecord("1", "Test", "Client", LocalDate.now(), "test@test.com", "123", "300", 2, 50000.0);
-        validStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
+        this.applicationRequest = new Application(null, "", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1);
+        this.validLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.valueOf(5000), BigDecimal.valueOf(20000), BigDecimal.valueOf(0.05), true);
+        this.validUser = new UserRecord("1", "Test", "Client", LocalDate.now(), "test@test.com", "123", "300", 2, 50000.0);
+        this.validStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
 
         // Los mocks se configuran ahora en cada prueba individual para mayor claridad y evitar UnnecessaryStubbingException.
     }
@@ -91,40 +91,40 @@ class ApplicationUseCaseTest {
     @DisplayName("AC8: Debe crear una solicitud exitosamente cuando todas las validaciones pasan")
     void shouldCreateApplicationSuccessfullyWhenAllValidationsPass() {
         // Arrange
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
-        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
-        when(applicationGateway.save(any(Application.class))).thenReturn(Mono.just(applicationRequest));
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(this.validLoanType));
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(this.validUser));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
+        when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        when(this.applicationGateway.save(any(Application.class))).thenReturn(Mono.just(this.applicationRequest));
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);
 
         // Assert
         StepVerifier.create(result)
                 .assertNext(creationResult -> {
                     assertNotNull(creationResult);
-                    assertEquals(validUser.getEmail(), creationResult.user().getEmail());
-                    assertEquals(validLoanType.getName(), creationResult.loanType().getName());
-                    assertEquals(validStatus.getName(), creationResult.status().getName());
+                    assertEquals(this.validUser.getEmail(), creationResult.user().getEmail());
+                    assertEquals(this.validLoanType.getName(), creationResult.loanType().getName());
+                    assertEquals(this.validStatus.getName(), creationResult.status().getName());
                 })
                 .verifyComplete();
 
-        verify(applicationGateway).save(any(Application.class));
+        verify(this.applicationGateway).save(any(Application.class));
     }
 
     @Test
     @DisplayName("AC3: Debe lanzar BusinessException cuando el tipo de préstamo no existe")
     void shouldThrowBusinessExceptionWhenLoanTypeDoesNotExist() {
         // Arrange
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.empty());
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.empty());
         // Aunque esperamos que el flujo falle antes, Mono.zip se suscribe a todas las fuentes.
         // Por lo tanto, debemos proporcionar mocks para las otras llamadas para evitar un NullPointerException.
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(this.validUser));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);
 
         // Assert
         StepVerifier.create(result).expectError(BusinessException.class).verify();
@@ -135,13 +135,13 @@ class ApplicationUseCaseTest {
     void shouldThrowBusinessExceptionWhenUserDoesNotExist() {
         // Arrange
         // Para que el flujo llegue a la validación del usuario, las validaciones anteriores deben pasar.
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(this.validLoanType));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
         // Configuramos el mock del usuario para que falle.
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.empty());
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.empty());
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);
 
         // Assert
         StepVerifier.create(result).expectError(BusinessException.class).verify();
@@ -152,15 +152,15 @@ class ApplicationUseCaseTest {
     void shouldThrowBusinessExceptionWhenUserRoleIsNotClient() {
         // Arrange
         // Para que el flujo llegue a la validación del rol, las validaciones anteriores deben pasar.
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
-        UserRecord userWithWrongRole = new UserRecord("1", "Test", "User", LocalDate.now(), "test@test.com", "123", "300", 1, 50000.0);
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(userWithWrongRole));
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(this.validLoanType));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
+        final UserRecord userWithWrongRole = new UserRecord("1", "Test", "User", LocalDate.now(), "test@test.com", "123", "300", 1, 50000.0);
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(userWithWrongRole));
         // Se añade el mock para que el flujo pase la validación de solicitudes abiertas.
-        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);
 
         // Assert
         StepVerifier.create(result).expectError(BusinessException.class).verify();
@@ -171,14 +171,14 @@ class ApplicationUseCaseTest {
     void shouldThrowBusinessExceptionWhenAmountIsOutOfRange() {
         // Arrange
         // Para que el flujo llegue a la validación del monto, las validaciones anteriores deben pasar.
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
-        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
-        Application requestWithInvalidAmount = new Application(null, "", BigDecimal.valueOf(4000), 12, "test@test.com", 1, 1);
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(this.validLoanType));
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(this.validUser));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
+        when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
+        final Application requestWithInvalidAmount = new Application(null, "", BigDecimal.valueOf(4000), 12, "test@test.com", 1, 1);
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(requestWithInvalidAmount);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(requestWithInvalidAmount);
 
         // Assert
         StepVerifier.create(result).expectError(BusinessException.class).verify();
@@ -189,16 +189,16 @@ class ApplicationUseCaseTest {
     void shouldThrowBusinessExceptionWhenOpenApplicationExists() {
         // Arrange
         // Para que el flujo llegue a la validación de solicitudes abiertas, las validaciones anteriores deben pasar.
-        when(loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(validLoanType));
-        when(userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(validUser));
-        when(statusGateway.findById(anyInt())).thenReturn(Mono.just(validStatus));
+        when(this.loanTypeGateway.findById(anyInt())).thenReturn(Mono.just(this.validLoanType));
+        when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(this.validUser));
+        when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
 
         // Simulamos que el repositorio encuentra una solicitud abierta para este cliente.
-        when(applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
+        when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
                 .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1)));
 
         // Act
-        Mono<ApplicationCreationResult> result = applicationUseCase.createLoanApplication(applicationRequest);
+        final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);
 
         // Assert
         StepVerifier.create(result)

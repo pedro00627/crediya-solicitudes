@@ -19,13 +19,13 @@ class ConfigTest {
 
     private final WebTestClient webTestClient;
 
-    public ConfigTest(@Autowired WebTestClient webTestClient) {
+    public ConfigTest(@Autowired final WebTestClient webTestClient) {
         this.webTestClient = webTestClient;
     }
 
     @Test
     void securityHeadersShouldBeAppliedToResponses() {
-        webTestClient.get()
+        this.webTestClient.get()
                 .uri("/any-endpoint")
                 .exchange()
                 .expectStatus().isNotFound() // Ahora debería ser 404 porque la seguridad está deshabilitada

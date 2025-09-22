@@ -19,10 +19,10 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouterRest {
     @Bean
     @RouterOperations({
-            @RouterOperation(path = "/api/v1/solicitud", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST, beanClass = ApplicationCommandHandler.class, beanMethod = "createLoanApplication"),
-            @RouterOperation(path = "/api/v1/solicitud", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET, beanClass = ApplicationQueryHandler.class, beanMethod = "getApplicationsForReview")
+            @RouterOperation(path = "/api/v1/solicitud", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST, beanClass = ApplicationCommandHandler.class, beanMethod = "createLoanApplication"),
+            @RouterOperation(path = "/api/v1/solicitud", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET, beanClass = ApplicationQueryHandler.class, beanMethod = "getApplicationsForReview")
     })
-    public RouterFunction<ServerResponse> routerFunction(ApplicationCommandHandler commandHandler, ApplicationQueryHandler queryHandler) {
+    public RouterFunction<ServerResponse> routerFunction(final ApplicationCommandHandler commandHandler, final ApplicationQueryHandler queryHandler) {
         return route().nest(
                 path("/api/v1/solicitud"), builder -> builder
                         .route(POST("").and(accept(MediaType.APPLICATION_JSON)), commandHandler::createLoanApplication)

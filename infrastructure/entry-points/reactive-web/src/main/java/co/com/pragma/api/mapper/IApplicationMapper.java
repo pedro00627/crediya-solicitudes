@@ -20,7 +20,7 @@ public interface IApplicationMapper {
     @Mapping(source = "application", target = "applicationResponseRecord")
     @Mapping(source = "status", target = "statusResponseRecord")
     @Mapping(target = "loanTypeResponseRecord", expression = "java(toLoanTypeResponseRecord(applicationCreationResult.loanType()))")
-    public abstract ResponseRecord toResponse(ApplicationCreationResult applicationCreationResult);
+    ResponseRecord toResponse(ApplicationCreationResult applicationCreationResult);
 
     // Mapea el request DTO al modelo de dominio, ignorando los campos que se generan en el backend.
     @Mapping(target = "applicationId", ignore = true)
@@ -42,10 +42,10 @@ public interface IApplicationMapper {
 
 
     // Ayuda a MapStruct a mapear el ID del dominio al ID del DTO de respuesta
-    public abstract ApplicationResponseRecord toApplicationResponseRecord(Application application);
+    ApplicationResponseRecord toApplicationResponseRecord(Application application);
 
     // Métodos de mapeo para Status y LoanType a sus DTOs de respuesta
-    public abstract StatusResponseRecord toStatusResponseRecord(Status status);
+    StatusResponseRecord toStatusResponseRecord(Status status);
 
-    public abstract LoanTypeResponseRecord toLoanTypeResponseRecord(LoanType loanType);
+    LoanTypeResponseRecord toLoanTypeResponseRecord(LoanType loanType);
 }

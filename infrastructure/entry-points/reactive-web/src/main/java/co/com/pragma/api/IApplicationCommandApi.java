@@ -12,12 +12,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 public interface IApplicationCommandApi {
-    @Operation(operationId = "createLoanApplication", summary = "Crear una nueva solicitud de préstamo", tags = {"Loan Applications"},
-            requestBody = @RequestBody(required = true, description = "Datos para la nueva solicitud de préstamo", content = @Content(schema = @Schema(implementation = ApplicationRequestRecord.class))),
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Solicitud creada exitosamente", content = @Content(schema = @Schema(implementation = ResponseRecord.class))),
-                    @ApiResponse(responseCode = "400", description = "Solicitud inválida (datos faltantes o incorrectos)"),
-                    @ApiResponse(responseCode = "409", description = "Conflicto de negocio (ej: el usuario no es cliente, el monto está fuera de rango)")
-            })
+    @Operation(operationId = "createLoanApplication", summary = "Crear una nueva solicitud de préstamo", tags = "Loan Applications", requestBody = @RequestBody(required = true, description = "Datos para la nueva solicitud de préstamo", content = @Content(schema = @Schema(implementation = ApplicationRequestRecord.class))), responses = {
+            @ApiResponse(responseCode = "201", description = "Solicitud creada exitosamente", content = @Content(schema = @Schema(implementation = ResponseRecord.class))),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida (datos faltantes o incorrectos)"),
+            @ApiResponse(responseCode = "409", description = "Conflicto de negocio (ej: el usuario no es cliente, el monto está fuera de rango)")
+    })
     Mono<ServerResponse> createLoanApplication(ServerRequest serverRequest);
 }

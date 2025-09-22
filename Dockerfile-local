@@ -1,18 +1,17 @@
-# === Stage 1: Build microservice ===
+# === Stage 1: Build everything in one stage ===
 FROM gradle:9.0.0-jdk21-alpine AS build
 WORKDIR /workspace
 
-# Copy only the microservice files
-COPY Solicitudes ./
+# Copy Common module first
+COPY Common ./Common
 
-# Set GitHub Packages credentials
-ARG GITHUB_ACTOR
-ARG GITHUB_TOKEN
-ENV GITHUB_ACTOR=${GITHUB_ACTOR}
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+# Copy microservice
+COPY Solicitudes ./Solicitudes
 
-# Build microservice JAR (will download Common from GitHub Packages)
-RUN cd . && \
+# Build Common and then microservice
+RUN cd Common && \
+    ./gradlew publishToMavenLocal --no-daemon --quiet --parallel -x test && \
+    cd ../Solicitudes && \
     ./gradlew bootJar --no-daemon --quiet --parallel -x test && \
     find . -name "*.jar" -not -path "*/build/libs/*" -delete
 
@@ -21,7 +20,7 @@ FROM gcr.io/distroless/java21-debian12:nonroot
 WORKDIR /app
 
 # Copy only the final JAR
-COPY --from=build /workspace/applications/app-service/build/libs/*.jar ./solicitudes.jar
+COPY --from=build /workspace/Solicitudes/applications/app-service/build/libs/*.jar ./solicitudes.jar
 
 # Use non-root user for security
 USER nonroot:nonroot

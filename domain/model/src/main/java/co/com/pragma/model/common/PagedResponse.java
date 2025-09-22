@@ -12,52 +12,52 @@ public class PagedResponse<T> {
     public PagedResponse() {
     }
 
-    public PagedResponse(List<T> content, int currentPage, long totalItems, int totalPages) {
+    public PagedResponse(final List<T> content, final int currentPage, final long totalItems, final int totalPages) {
         this.content = content;
         this.currentPage = currentPage;
         this.totalItems = totalItems;
         this.totalPages = totalPages;
     }
 
-    public static <T> PagedResponse<T> of(List<T> content, int currentPage, long totalItems, int pageSize) {
-        if (pageSize <= 0) {
+    public static <T> PagedResponse<T> of(final List<T> content, final int currentPage, final long totalItems, final int pageSize) {
+        if (0 >= pageSize) {
             throw new IllegalArgumentException("Page size must be greater than zero.");
         }
         // El cálculo de totalPages se encapsula aquí.
         // Math.ceil maneja correctamente el caso de totalItems = 0.
-        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        final int totalPages = (int) Math.ceil((double) totalItems / pageSize);
         return new PagedResponse<>(content, currentPage, totalItems, totalPages);
     }
 
     public List<T> getContent() {
-        return content;
+        return this.content;
     }
 
-    public void setContent(List<T> content) {
+    public void setContent(final List<T> content) {
         this.content = content;
     }
 
     public int getCurrentPage() {
-        return currentPage;
+        return this.currentPage;
     }
 
-    public void setCurrentPage(int currentPage) {
+    public void setCurrentPage(final int currentPage) {
         this.currentPage = currentPage;
     }
 
     public long getTotalItems() {
-        return totalItems;
+        return this.totalItems;
     }
 
-    public void setTotalItems(long totalItems) {
+    public void setTotalItems(final long totalItems) {
         this.totalItems = totalItems;
     }
 
     public int getTotalPages() {
-        return totalPages;
+        return this.totalPages;
     }
 
-    public void setTotalPages(int totalPages) {
+    public void setTotalPages(final int totalPages) {
         this.totalPages = totalPages;
     }
 }

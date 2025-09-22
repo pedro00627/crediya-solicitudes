@@ -105,6 +105,7 @@ jwt:
     - /swagger-ui/**
     - /webjars/**
     - /v3/api-docs/**
+    - /actuator/**
 
 security:
   rules:
@@ -116,6 +117,8 @@ security:
       - path: /webjars/**
         roles: [ ROLE_ANONYMOUS ]
       - path: /v3/api-docs/**
+        roles: [ ROLE_ANONYMOUS ]
+      - path: /actuator/**
         roles: [ ROLE_ANONYMOUS ]
       - path: /api/v1/solicitud
         method: POST
