@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -27,11 +28,15 @@ class UseCasesConfigTest {
     @Autowired
     private ApplicationUseCase applicationUseCase;
 
+    // Usar @MockBean para reemplazar el bean LoggerPort existente con un mock
+    @MockitoBean
+    private LoggerPort loggerPort; // Spring Boot creará un mock y lo inyectará
+
     @Test
     void applicationUseCaseShouldBeCreated() {
         // La prueba ahora simplemente verifica que el contexto de Spring pudo
         // crear el bean 'applicationUseCase' inyectando todos los mocks.
-        assertNotNull(applicationUseCase);
+        assertNotNull(this.applicationUseCase);
     }
 
     /**
@@ -62,16 +67,6 @@ class UseCasesConfigTest {
             return Mockito.mock(ApplicationGateway.class);
         }
 
-        @Bean
-        public LoggerPort loggerPort() {
-            return Mockito.mock(LoggerPort.class);
-        }
-
-        /**
-         * Se proporciona un mock del bean 'AppRules' directamente.
-         * Como la configuración real de AppRules no se carga en esta prueba,
-         * este mock es la única definición disponible, evitando conflictos.
-         */
         @Bean
         @Primary
         public AppRules appRules() {

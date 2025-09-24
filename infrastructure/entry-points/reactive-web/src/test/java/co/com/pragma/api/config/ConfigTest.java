@@ -1,5 +1,6 @@
 package co.com.pragma.api.config;
 
+import co.com.pragma.security.api.SecurityHeadersConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -13,18 +14,18 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         SecurityAutoConfiguration.class,
         ReactiveSecurityAutoConfiguration.class
 })
-@Import({CorsConfig.class, SecurityHeadersConfig.class, ConfigTest.TestApplication.class})
+@Import({SecurityHeadersConfig.class, ConfigTest.TestApplication.class})
 class ConfigTest {
 
     private final WebTestClient webTestClient;
 
-    public ConfigTest(@Autowired WebTestClient webTestClient) {
+    public ConfigTest(@Autowired final WebTestClient webTestClient) {
         this.webTestClient = webTestClient;
     }
 
     @Test
     void securityHeadersShouldBeAppliedToResponses() {
-        webTestClient.get()
+        this.webTestClient.get()
                 .uri("/any-endpoint")
                 .exchange()
                 .expectStatus().isNotFound() // Ahora debería ser 404 porque la seguridad está deshabilitada

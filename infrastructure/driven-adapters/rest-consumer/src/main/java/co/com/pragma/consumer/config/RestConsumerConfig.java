@@ -21,18 +21,18 @@ public class RestConsumerConfig {
 
     private final int timeout;
 
-    public RestConsumerConfig(@Value("${adapters.user-api.url}") String url,
-                              @Value("${adapters.user-api.timeout}") int timeout) {
+    public RestConsumerConfig(@Value("${adapters.user-api.url}") final String url,
+                              @Value("${adapters.user-api.timeout}") final int timeout) {
         this.url = url;
         this.timeout = timeout;
     }
 
     @Bean
-    public WebClient getWebClient(WebClient.Builder builder) {
+    public WebClient getWebClient(final WebClient.Builder builder) {
         return builder
-                .baseUrl(url)
+                .baseUrl(this.url)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                .clientConnector(getClientHttpConnector())
+                .clientConnector(this.getClientHttpConnector())
                 .build();
     }
 
@@ -43,10 +43,10 @@ public class RestConsumerConfig {
         return new ReactorClientHttpConnector(HttpClient.create()
                 .compress(true)
                 .keepAlive(true)
-                .option(CONNECT_TIMEOUT_MILLIS, timeout)
+                .option(CONNECT_TIMEOUT_MILLIS, this.timeout)
                 .doOnConnected(connection -> {
-                    connection.addHandlerLast(new ReadTimeoutHandler(timeout, MILLISECONDS));
-                    connection.addHandlerLast(new WriteTimeoutHandler(timeout, MILLISECONDS));
+                    connection.addHandlerLast(new ReadTimeoutHandler(this.timeout, MILLISECONDS));
+                    connection.addHandlerLast(new WriteTimeoutHandler(this.timeout, MILLISECONDS));
                 }));
     }
 

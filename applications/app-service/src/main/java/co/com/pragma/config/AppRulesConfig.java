@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppRulesConfig {
 
     @Bean
-    public AppRules appRules(AppRulesProperties properties) {
+    public AppRules appRules(final AppRulesProperties properties) {
         return new AppRules(
                 properties.clientRoleId(),
                 properties.pendingStatusId(),

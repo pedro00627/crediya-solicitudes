@@ -18,12 +18,12 @@ public interface ApplicationReactiveRepository extends ReactiveCrudRepository<Ap
     Flux<ApplicationEntity> findOpenApplicationsByDocumentId(String documentId, List<Integer> statusIds);
 
     @Query("SELECT s.* FROM solicitudes.solicitud s " +
-           "INNER JOIN solicitudes.estados es ON s.id_estado = es.id_estado " +
-           "WHERE es.nombre IN (:statuses)")
+            "INNER JOIN solicitudes.estados es ON s.id_estado = es.id_estado " +
+            "WHERE es.nombre IN (:statuses)")
     Flux<ApplicationEntity> findByStatusIn(List<String> statuses, Pageable pageable);
 
     @Query("SELECT COUNT(s.id_solicitud) FROM solicitudes.solicitud s " +
-           "INNER JOIN solicitudes.estados es ON s.id_estado = es.id_estado " +
-           "WHERE es.nombre IN (:statuses)")
+            "INNER JOIN solicitudes.estados es ON s.id_estado = es.id_estado " +
+            "WHERE es.nombre IN (:statuses)")
     Mono<Long> countByStatusIn(List<String> statuses);
 }

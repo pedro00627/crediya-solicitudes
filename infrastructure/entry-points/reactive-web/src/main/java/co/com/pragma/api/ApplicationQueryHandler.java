@@ -1,11 +1,11 @@
 package co.com.pragma.api;
 
-import co.com.pragma.model.application.ApplicationReviewDTO;
+import co.com.pragma.api.dto.ApplicationReviewDTO;
 import co.com.pragma.api.mapper.ApplicationMapperAdapter;
-import co.com.pragma.model.application.gateways.FindApplicationsForReviewUseCase;
 import co.com.pragma.model.common.PageRequest;
 import co.com.pragma.model.common.PagedResponse;
 import co.com.pragma.model.log.gateways.LoggerPort;
+import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -26,20 +26,20 @@ public class ApplicationQueryHandler implements IApplicationQueryApi {
     private final LoggerPort logger;
 
     @Override
-    public Mono<ServerResponse> getApplicationsForReview(ServerRequest serverRequest) {
-        return extractAndValidatePageRequest(serverRequest)
+    public Mono<ServerResponse> getApplicationsForReview(final ServerRequest serverRequest) {
+        return this.extractAndValidatePageRequest(serverRequest)
                 .flatMap(pageRequest -> {
-                    Mono<Long> totalItemsMono = findApplicationsForReviewUseCase.countApplicationsForReview();
+                    final Mono<Long> totalItemsMono = this.findApplicationsForReviewUseCase.countApplicationsForReview();
 
                     // Se delega toda la lógica de enriquecimiento al mapper para que lo haga en lote.
-                    var applicationsFlux = findApplicationsForReviewUseCase.findApplicationsForReview(pageRequest);
-                    Mono<List<ApplicationReviewDTO>> contentMono = mapper.toEnrichedReviewDTOs(applicationsFlux);
+                    final var applicationsFlux = this.findApplicationsForReviewUseCase.findApplicationsForReview(pageRequest);
+                    final Mono<List<ApplicationReviewDTO>> contentMono = this.mapper.toEnrichedReviewDTOs(applicationsFlux);
 
                     return Mono.zip(contentMono, totalItemsMono)
                             .flatMap(tuple -> {
-                                var content = tuple.getT1();
-                                var totalItems = tuple.getT2();
-                                var pagedResponse = PagedResponse.of(content, pageRequest.page(), totalItems, pageRequest.size());
+                                final var content = tuple.getT1();
+                                final var totalItems = tuple.getT2();
+                                final var pagedResponse = PagedResponse.of(content, pageRequest.page(), totalItems, pageRequest.size());
 
                                 return ServerResponse.ok()
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -48,24 +48,24 @@ public class ApplicationQueryHandler implements IApplicationQueryApi {
                 });
     }
 
-    private Mono<PageRequest> extractAndValidatePageRequest(ServerRequest serverRequest) {
-        Mono<Integer> pageMono = parseQueryParam(serverRequest, "page", 0);
-        Mono<Integer> sizeMono = parseQueryParam(serverRequest, "size", 10);
+    private Mono<PageRequest> extractAndValidatePageRequest(final ServerRequest serverRequest) {
+        final Mono<Integer> pageMono = this.parseQueryParam(serverRequest, "page", 0);
+        final Mono<Integer> sizeMono = this.parseQueryParam(serverRequest, "size", 10);
 
         return Mono.zip(pageMono, sizeMono)
                 .flatMap(tuple -> {
-                    int page = tuple.getT1();
-                    int size = tuple.getT2();
-                    logger.info("Recibida solicitud GET /api/v1/solicitud para revisión manual. Page: {}, Size: {}", page, size);
+                    final int page = tuple.getT1();
+                    final int size = tuple.getT2();
+                    this.logger.info("Recibida solicitud GET /api/v1/solicitud para revisión manual. Page: {}, Size: {}", page, size);
 
-                    if (page < 0 || size <= 0) {
+                    if (0 > page || 0 >= size) {
                         return Mono.error(new IllegalArgumentException("Los parámetros de paginación 'page' y 'size' deben ser positivos."));
                     }
                     return Mono.just(new PageRequest(page, size));
                 });
     }
 
-    private Mono<Integer> parseQueryParam(ServerRequest request, String paramName, int defaultValue) {
+    private Mono<Integer> parseQueryParam(final ServerRequest request, final String paramName, final int defaultValue) {
         return Mono.just(request.queryParam(paramName).orElse(String.valueOf(defaultValue)))
                 .map(Integer::parseInt)
                 .onErrorMap(NumberFormatException.class, e -> new IllegalArgumentException("El parámetro '" + paramName + "' debe ser un número entero válido."));

@@ -18,7 +18,7 @@ public class LoanTypeRepositoryAdapter extends AbstractCachedRepositoryAdapter<L
     private final LoanTypeDataRepository repository;
     private final LoanTypeMapper loanTypeMapper;
 
-    public LoanTypeRepositoryAdapter(LoanTypeDataRepository repository, LoanTypeMapper loanTypeMapper, CacheManager cacheManager, LoggerPort logger) {
+    public LoanTypeRepositoryAdapter(final LoanTypeDataRepository repository, final LoanTypeMapper loanTypeMapper, final CacheManager cacheManager, final LoggerPort logger) {
         super(cacheManager, logger);
         this.repository = repository;
         this.loanTypeMapper = loanTypeMapper;
@@ -40,39 +40,40 @@ public class LoanTypeRepositoryAdapter extends AbstractCachedRepositoryAdapter<L
     }
 
     @Override
-    protected Object getEntityId(LoanType entity) {
+    protected Object getEntityId(final LoanType entity) {
         return entity.getLoanTypeId();
     }
 
     @Override
-    protected String getEntityName(LoanType entity) {
+    protected String getEntityName(final LoanType entity) {
         return entity.getName();
     }
 
     @Override
-    protected Mono<LoanType> fetchByIdFromDatabase(Object id) {
-        return repository.findById((Integer) id)
-                .map(loanTypeMapper::toDomain);
+    protected Mono<LoanType> fetchByIdFromDatabase(final Object id) {
+        return this.repository.findById((Integer) id)
+                .map(this.loanTypeMapper::toDomain);
     }
 
     @Override
-    protected Mono<LoanType> fetchByNameFromDatabase(String name) {
-        return repository.findByName(name)
-                .map(loanTypeMapper::toDomain);
+    protected Mono<LoanType> fetchByNameFromDatabase(final String name) {
+        return this.repository.findByName(name)
+                .map(this.loanTypeMapper::toDomain);
     }
 
     @Override
-    public Flux<LoanType> findAllByIds(Set<Integer> ids) {
-        return repository.findAllByLoanTypeIdIn(ids).map(loanTypeMapper::toDomain);    }
+    public Flux<LoanType> findAllByIds(final Set<Integer> ids) {
+        return this.repository.findAllByLoanTypeIdIn(ids).map(this.loanTypeMapper::toDomain);
+    }
 
     // Implementación explícita de los métodos de LoanTypeGateway
     @Override
-    public Mono<LoanType> findById(Integer id) {
+    public Mono<LoanType> findById(final Integer id) {
         return super.findById(id);
     }
 
     @Override
-    public Mono<LoanType> findByName(String loanTypeName) {
+    public Mono<LoanType> findByName(final String loanTypeName) {
         return super.findByName(loanTypeName);
     }
 }

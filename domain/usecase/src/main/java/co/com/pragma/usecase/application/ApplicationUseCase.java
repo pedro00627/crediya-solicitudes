@@ -3,7 +3,6 @@ package co.com.pragma.usecase.application;
 import co.com.pragma.model.application.Application;
 import co.com.pragma.model.application.ApplicationCreationResult;
 import co.com.pragma.model.application.gateways.ApplicationGateway;
-import co.com.pragma.model.application.gateways.CreateLoanApplicationUseCase;
 import co.com.pragma.model.config.AppRules;
 import co.com.pragma.model.exception.BusinessException;
 import co.com.pragma.model.exception.BusinessMessages;
@@ -29,7 +28,7 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
     private final LoggerPort logger;
     private final AppRules appRules;
 
-    public ApplicationUseCase(LoanTypeGateway loanTypeGateway, StatusGateway statusGateway, UserGateway userGateway, ApplicationGateway applicationGateway, LoggerPort logger, AppRules appRules) {
+    public ApplicationUseCase(final LoanTypeGateway loanTypeGateway, final StatusGateway statusGateway, final UserGateway userGateway, final ApplicationGateway applicationGateway, final LoggerPort logger, final AppRules appRules) {
         this.loanTypeGateway = loanTypeGateway;
         this.statusGateway = statusGateway;
         this.userGateway = userGateway;
@@ -43,65 +42,65 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
      * Orquesta la creación de una solicitud de préstamo, validando datos y reglas de negocio.
      */
     @Override
-    public Mono<ApplicationCreationResult> createLoanApplication(Application applicationRequest) {
-        logger.info("Iniciando proceso. Email: {}, Request inicial: statusId={}, loanTypeId={}",
-                logger.maskEmail(applicationRequest.getEmail()), applicationRequest.getStatusId(), applicationRequest.getLoanTypeId());
+    public Mono<ApplicationCreationResult> createLoanApplication(final Application applicationRequest) {
+        this.logger.info("Iniciando proceso. Email: {}, Request inicial: statusId={}, loanTypeId={}",
+                this.logger.maskEmail(applicationRequest.getEmail()), applicationRequest.getStatusId(), applicationRequest.getLoanTypeId());
 
-        return fetchAndValidateRequiredData(applicationRequest)
-                .flatMap(validationData -> validateBusinessRules(applicationRequest, validationData))
+        return this.fetchAndValidateRequiredData(applicationRequest)
+                .flatMap(validationData -> this.validateBusinessRules(applicationRequest, validationData))
                 .flatMap(this::checkForOpenApplications)
-                .flatMap(validatedData -> fetchDefaultInitialStatus()
-                        .flatMap(defaultStatus -> saveApplicationAndBuildResult(applicationRequest, validatedData, defaultStatus)));
+                .flatMap(validatedData -> this.fetchDefaultInitialStatus()
+                        .flatMap(defaultStatus -> this.saveApplicationAndBuildResult(applicationRequest, validatedData, defaultStatus)));
     }
 
     /**
      * Paso 1: Obtiene y valida datos externos de forma concurrente.
      */
-    private Mono<ValidationData> fetchAndValidateRequiredData(Application applicationRequest) {
-        logger.debug("Paso 1 - fetchAndValidateRequiredData. Request: statusId={}, loanTypeId={}, email={}",
-                applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), logger.maskEmail(applicationRequest.getEmail()));
+    private Mono<ValidationData> fetchAndValidateRequiredData(final Application applicationRequest) {
+        this.logger.debug("Paso 1 - fetchAndValidateRequiredData. Request: statusId={}, loanTypeId={}, email={}",
+                applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), this.logger.maskEmail(applicationRequest.getEmail()));
 
-        Mono<LoanType> loanTypeMono = findAndValidateLoanType(applicationRequest.getLoanTypeId());
-        Mono<UserRecord> userMono = findAndValidateUser(applicationRequest.getEmail());
+        final Mono<LoanType> loanTypeMono = this.findAndValidateLoanType(applicationRequest.getLoanTypeId());
+        final Mono<UserRecord> userMono = this.findAndValidateUser(applicationRequest.getEmail());
 
         return Mono.zip(loanTypeMono, userMono)
                 .map(tuple -> new ValidationData(tuple.getT1(), tuple.getT2()));
     }
 
-    private Mono<LoanType> findAndValidateLoanType(Integer loanTypeId) {
-        logger.debug("Buscando y validando LoanType con ID: {}", loanTypeId);
-        return findOrThrow(loanTypeGateway.findById(loanTypeId), BusinessMessages.LOAN_TYPE_NOT_FOUND)
-                .doOnSuccess(loanType -> logger.debug("LoanType encontrado y validado: {}", loanType.getName()));
+    private Mono<LoanType> findAndValidateLoanType(final Integer loanTypeId) {
+        this.logger.debug("Buscando y validando LoanType con ID: {}", loanTypeId);
+        return this.findOrThrow(this.loanTypeGateway.findById(loanTypeId), BusinessMessages.LOAN_TYPE_NOT_FOUND)
+                .doOnSuccess(loanType -> this.logger.debug("LoanType encontrado y validado: {}", loanType.getName()));
     }
 
-    private Mono<UserRecord> findAndValidateUser(String email) {
-        logger.debug("Buscando y validando User con email: {}", logger.maskEmail(email));
-        return findOrThrow(userGateway.findUserByEmail(email), BusinessMessages.USER_NOT_FOUND)
-                .doOnSuccess(user -> logger.debug("User encontrado y validado: documentId={}", logger.maskDocument(user.getIdentityDocument())));
+    private Mono<UserRecord> findAndValidateUser(final String email) {
+        this.logger.debug("Buscando y validando User con email: {}", this.logger.maskEmail(email));
+        return this.findOrThrow(this.userGateway.findUserByEmail(email), BusinessMessages.USER_NOT_FOUND)
+                .doOnSuccess(user -> this.logger.debug("User encontrado y validado: documentId={}", this.logger.maskDocument(user.getIdentityDocument())));
     }
 
     /**
      * Busca el estado por defecto para una nueva solicitud (PENDIENTE).
      */
     private Mono<Status> fetchDefaultInitialStatus() {
-        logger.debug("Buscando estado por defecto (PENDIENTE) con ID: {}", appRules.pendingStatusId());
-        return findOrThrow(statusGateway.findById(appRules.pendingStatusId()), BusinessMessages.INITIAL_STATUS_NOT_FOUND)
-                .doOnSuccess(status -> logger.debug("Estado por defecto encontrado: {}", status.getName()));
+        this.logger.debug("Buscando estado por defecto (PENDIENTE) con ID: {}", this.appRules.pendingStatusId());
+        return this.findOrThrow(this.statusGateway.findById(this.appRules.pendingStatusId()), BusinessMessages.INITIAL_STATUS_NOT_FOUND)
+                .doOnSuccess(status -> this.logger.debug("Estado por defecto encontrado: {}", status.getName()));
     }
 
     /**
      * Valida que el cliente no tenga solicitudes de préstamo abiertas.
      */
-    private Mono<ValidationData> checkForOpenApplications(ValidationData data) {
+    private Mono<ValidationData> checkForOpenApplications(final ValidationData data) {
         return Mono.just(data)
-                .filter(validationData -> validationData.user() != null && validationData.user().getIdentityDocument() != null && !validationData.user().getIdentityDocument().isBlank())
+                .filter(validationData -> null != validationData.user() && null != validationData.user().getIdentityDocument() && !validationData.user().getIdentityDocument().isBlank())
                 .switchIfEmpty(Mono.error(new BusinessException("No se pudo obtener un documento de identidad válido del usuario.")))
                 .flatMap(validationData -> {
-                    String documentId = validationData.user().getIdentityDocument();
-                    logger.debug("Paso 1.5: Verificando solicitudes abiertas para el usuario: {} con documentId: {}",
-                            logger.maskEmail(validationData.user().getEmail()), logger.maskDocument(documentId));
+                    final String documentId = validationData.user().getIdentityDocument();
+                    this.logger.debug("Paso 1.5: Verificando solicitudes abiertas para el usuario: {} con documentId: {}",
+                            this.logger.maskEmail(validationData.user().getEmail()), this.logger.maskDocument(documentId));
 
-                    return applicationGateway.findOpenApplicationsByDocumentId(validationData.user().getIdentityDocument(), appRules.terminalStatusIds())
+                    return this.applicationGateway.findOpenApplicationsByDocumentId(validationData.user().getIdentityDocument(), this.appRules.terminalStatusIds())
                             .hasElements()
                             .flatMap(hasOpen -> Boolean.TRUE.equals(hasOpen)
                                     ? Mono.error(new BusinessException(BusinessMessages.USER_HAS_ACTIVE_APPLICATION))
@@ -112,11 +111,11 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
     /**
      * Paso 2: Valida las reglas de negocio como el rol del usuario y el monto del préstamo.
      */
-    private Mono<ValidationData> validateBusinessRules(Application applicationRequest, ValidationData data) {
-        logger.debug("Paso 2 - validateBusinessRules. Request: statusId={}, loanTypeId={}. Validando para usuario: {}",
-                applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), logger.maskEmail(data.user().getEmail()));
+    private Mono<ValidationData> validateBusinessRules(final Application applicationRequest, final ValidationData data) {
+        this.logger.debug("Paso 2 - validateBusinessRules. Request: statusId={}, loanTypeId={}. Validando para usuario: {}",
+                applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), this.logger.maskEmail(data.user().getEmail()));
         return Mono.fromCallable(() -> {
-            ApplicationValidator.validateUserRole(data.user(), appRules.clientRoleId());
+            ApplicationValidator.validateUserRole(data.user(), this.appRules.clientRoleId());
             ApplicationValidator.validateLoanAmount(applicationRequest, data.loanType());
             return data;
         });
@@ -125,10 +124,10 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
     /**
      * Paso 3: Guarda la solicitud y construye el resultado final.
      */
-    private Mono<ApplicationCreationResult> saveApplicationAndBuildResult(Application applicationRequest, ValidationData data, Status defaultStatus) {
-        logger.debug("Paso 3 - saveApplicationAndBuildResult. Request original: statusId={}, loanTypeId={}. Estado por defecto a usar: statusId={}",
+    private Mono<ApplicationCreationResult> saveApplicationAndBuildResult(final Application applicationRequest, final ValidationData data, final Status defaultStatus) {
+        this.logger.debug("Paso 3 - saveApplicationAndBuildResult. Request original: statusId={}, loanTypeId={}. Estado por defecto a usar: statusId={}",
                 applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), defaultStatus.getStatusId());
-        Application applicationToSave = new Application(
+        final Application applicationToSave = new Application(
                 null,
                 data.user().getIdentityDocument(),
                 applicationRequest.getAmount(),
@@ -138,11 +137,11 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
                 data.loanType().getLoanTypeId()
         );
 
-        return applicationGateway.save(applicationToSave)
+        return this.applicationGateway.save(applicationToSave)
                 .map(savedApplication -> new ApplicationCreationResult(savedApplication, data.loanType(), defaultStatus, data.user()));
     }
 
-    private <T> Mono<T> findOrThrow(Mono<T> source, String errorMessage) {
+    private <T> Mono<T> findOrThrow(final Mono<T> source, final String errorMessage) {
         return source.switchIfEmpty(Mono.error(new BusinessException(errorMessage)));
     }
 }

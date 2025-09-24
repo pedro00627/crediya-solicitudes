@@ -13,10 +13,10 @@ class PagedResponseTest {
     @Test
     void shouldCalculateTotalPagesCorrectlyWhenItemsFitExactly() {
         // Arrange: 20 items, 10 per page -> should be exactly 2 pages
-        List<String> content = Collections.nCopies(10, "item");
+        final List<String> content = Collections.nCopies(10, "item");
 
         // Act
-        PagedResponse<String> response = PagedResponse.of(content, 0, 20, 10);
+        final PagedResponse<String> response = PagedResponse.of(content, 0, 20, 10);
 
         // Assert
         assertThat(response.getTotalPages()).isEqualTo(2);
@@ -27,10 +27,10 @@ class PagedResponseTest {
     @Test
     void shouldCalculateTotalPagesCorrectlyWhenThereAreRemainingItems() {
         // Arrange: 21 items, 10 per page -> should be 3 pages (2 full, 1 with remainder)
-        List<String> content = Collections.nCopies(10, "item");
+        final List<String> content = Collections.nCopies(10, "item");
 
         // Act
-        PagedResponse<String> response = PagedResponse.of(content, 0, 21, 10);
+        final PagedResponse<String> response = PagedResponse.of(content, 0, 21, 10);
 
         // Assert
         assertThat(response.getTotalPages()).isEqualTo(3);
@@ -39,10 +39,10 @@ class PagedResponseTest {
     @Test
     void shouldReturnOnePageWhenTotalItemsIsLessThanPageSize() {
         // Arrange: 5 items, 10 per page -> should be 1 page
-        List<String> content = Collections.nCopies(5, "item");
+        final List<String> content = Collections.nCopies(5, "item");
 
         // Act
-        PagedResponse<String> response = PagedResponse.of(content, 0, 5, 10);
+        final PagedResponse<String> response = PagedResponse.of(content, 0, 5, 10);
 
         // Assert
         assertThat(response.getTotalPages()).isEqualTo(1);
@@ -51,13 +51,13 @@ class PagedResponseTest {
     @Test
     void shouldReturnZeroPagesWhenThereAreNoItems() {
         // Arrange: 0 items
-        List<String> content = Collections.emptyList();
+        final List<String> content = Collections.emptyList();
 
         // Act
-        PagedResponse<String> response = PagedResponse.of(content, 0, 0, 10);
+        final PagedResponse<String> response = PagedResponse.of(content, 0, 0, 10);
 
         // Assert
-        assertThat(response.getTotalPages()).isEqualTo(0);
+        assertThat(response.getTotalPages()).isZero();
     }
 
     @Test

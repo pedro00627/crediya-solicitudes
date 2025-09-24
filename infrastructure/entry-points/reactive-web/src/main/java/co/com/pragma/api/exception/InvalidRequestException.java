@@ -16,18 +16,18 @@ public class InvalidRequestException extends RuntimeException {
 
     private final transient Set<? extends ConstraintViolation<?>> violations;
 
-    public InvalidRequestException(Set<? extends ConstraintViolation<?>> violations) {
-        super(buildMessage(violations));
+    public InvalidRequestException(final Set<? extends ConstraintViolation<?>> violations) {
+        super(InvalidRequestException.buildMessage(violations));
         this.violations = violations;
     }
 
     // Nuevo constructor para manejar mensajes de String
-    public InvalidRequestException(String message) {
+    public InvalidRequestException(final String message) {
         super(message);
-        this.violations = Collections.emptySet(); // No hay violaciones específicas, se usa un conjunto vacío
+        violations = Collections.emptySet(); // No hay violaciones específicas, se usa un conjunto vacío
     }
 
-    private static String buildMessage(Set<? extends ConstraintViolation<?>> violations) {
+    private static String buildMessage(final Set<? extends ConstraintViolation<?>> violations) {
         return violations.stream()
                 .map(v -> String.format("'%s': %s", v.getPropertyPath(), v.getMessage()))
                 .collect(Collectors.joining(", "));

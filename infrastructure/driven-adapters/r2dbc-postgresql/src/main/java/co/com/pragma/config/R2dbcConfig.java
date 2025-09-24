@@ -10,7 +10,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 @EnableTransactionManagement
 public class R2dbcConfig {
     @Bean
-    public TransactionalOperator transactionalOperator(ReactiveTransactionManager reactiveTransactionManager) {
+    public TransactionalOperator transactionalOperator(final ReactiveTransactionManager reactiveTransactionManager) {
         return TransactionalOperator.create(reactiveTransactionManager);
     }
 }

@@ -23,14 +23,14 @@ public class TraceabilityFilter implements WebFilter {
     private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public Mono<Void> filter(final ServerWebExchange exchange, final WebFilterChain chain) {
         // Se usa Optional para obtener el encabezado y se genera un UUID si no está presente.
         // Esto asegura que 'correlationId' sea efectivamente final.
-        String correlationId = Optional.ofNullable(exchange.getRequest().getHeaders().getFirst(CORRELATION_ID_HEADER))
+        final String correlationId = Optional.ofNullable(exchange.getRequest().getHeaders().getFirst(TraceabilityFilter.CORRELATION_ID_HEADER))
                 .orElse(UUID.randomUUID().toString());
 
         // Añade el ID de correlación al Contexto de Reactor y continúa la cadena de filtros.
         return chain.filter(exchange)
-                .contextWrite(ctx -> ctx.put(CORRELATION_ID_KEY, correlationId));
+                .contextWrite(ctx -> ctx.put(TraceabilityFilter.CORRELATION_ID_KEY, correlationId));
     }
 }

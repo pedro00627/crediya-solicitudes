@@ -1,3 +1,4 @@
+/*
 package co.com.pragma.model.application.gateways;
 
 import co.com.pragma.model.application.Application;
@@ -9,3 +10,4 @@ public interface FindApplicationsForReviewUseCase {
     Flux<Application> findApplicationsForReview(PageRequest pageRequest);
     Mono<Long> countApplicationsForReview();
 }
+*/

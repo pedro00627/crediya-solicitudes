@@ -17,9 +17,9 @@ public class ApplicationResponseHandler implements IApplicationResponseHandler {
     private final IApplicationMapper responseMapper;
 
     @Override
-    public Mono<ServerResponse> buildCreationResponse(ApplicationCreationResult result) {
+    public Mono<ServerResponse> buildCreationResponse(final ApplicationCreationResult result) {
         return Mono.just(result)
-                .map(responseMapper::toResponse)
+                .map(this.responseMapper::toResponse)
                 .flatMap(response -> ServerResponse
                         .status(HttpStatus.CREATED)
                         .bodyValue(response));

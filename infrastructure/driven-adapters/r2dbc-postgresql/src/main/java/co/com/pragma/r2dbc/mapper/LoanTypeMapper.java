@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoanTypeMapper {
 
-    public LoanType toDomain(LoanTypeEntity entity) {
-        if (entity == null) {
+    public LoanType toDomain(final LoanTypeEntity entity) {
+        if (null == entity) {
             return null;
         }
         return new LoanType(
@@ -21,8 +21,8 @@ public class LoanTypeMapper {
         );
     }
 
-    public LoanTypeEntity toEntity(LoanType domain) {
-        if (domain == null) {
+    public LoanTypeEntity toEntity(final LoanType domain) {
+        if (null == domain) {
             return null;
         }
         return new LoanTypeEntity(

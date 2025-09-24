@@ -31,27 +31,27 @@ class RestConsumerTest {
 
     @BeforeAll
     static void setUp() throws IOException {
-        mockBackEnd = new MockWebServer();
-        mockBackEnd.start();
+        RestConsumerTest.mockBackEnd = new MockWebServer();
+        RestConsumerTest.mockBackEnd.start();
 
-        String baseUrl = mockBackEnd.url("/").toString();
-        WebClient.Builder webClientBuilder = WebClient.builder();
+        final String baseUrl = RestConsumerTest.mockBackEnd.url("/").toString();
+        final WebClient.Builder webClientBuilder = WebClient.builder();
 
-        LoggerPort logger = Mockito.mock(LoggerPort.class); // Initialize the logger mock
-        restConsumer = new RestConsumer(webClientBuilder, baseUrl, logger);
+        final LoggerPort logger = Mockito.mock(LoggerPort.class); // Initialize the logger mock
+        RestConsumerTest.restConsumer = new RestConsumer(webClientBuilder, baseUrl, logger);
     }
 
     @AfterAll
     static void tearDown() throws IOException {
-        mockBackEnd.shutdown();
+        RestConsumerTest.mockBackEnd.shutdown();
     }
 
     @Test
     @DisplayName("Debe encontrar un usuario por email exitosamente")
     void shouldFindUserByEmail() throws JsonProcessingException {
         // Arrange: Preparamos la respuesta que el servidor mock debe devolver
-        String email = "test@pragma.com.co";
-        UserRecord mockUser = new UserRecord(
+        final String email = "test@pragma.com.co";
+        final UserRecord mockUser = new UserRecord(
                 "1",
                 "Nombre",
                 "Apellido",
@@ -63,15 +63,15 @@ class RestConsumerTest {
                 50000.0
         );
         // Se crea el JSON a partir del objeto real, haciendo el test más robusto.
-        String jsonResponse = objectMapper.writeValueAsString(mockUser);
+        final String jsonResponse = RestConsumerTest.objectMapper.writeValueAsString(mockUser);
 
-        mockBackEnd.enqueue(new MockResponse()
+        RestConsumerTest.mockBackEnd.enqueue(new MockResponse()
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setResponseCode(HttpStatus.OK.value())
                 .setBody(jsonResponse));
 
         // Act: Llamamos al método que queremos probar
-        var response = restConsumer.findUserByEmail(email);
+        final var response = RestConsumerTest.restConsumer.findUserByEmail(email);
 
         // Assert: Verificamos que la respuesta es la esperada
         StepVerifier.create(response)
