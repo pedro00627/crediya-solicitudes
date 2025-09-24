@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatusMapper {
 
-    public Status toDomain(StatusEntity entity) {
-        if (entity == null) {
+    public Status toDomain(final StatusEntity entity) {
+        if (null == entity) {
             return null;
         }
         return new Status(
@@ -18,8 +18,8 @@ public class StatusMapper {
         );
     }
 
-    public StatusEntity toEntity(Status domain) {
-        if (domain == null) {
+    public StatusEntity toEntity(final Status domain) {
+        if (null == domain) {
             return null;
         }
         return new StatusEntity(

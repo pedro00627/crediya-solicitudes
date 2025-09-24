@@ -17,51 +17,51 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
     protected ObjectMapper mapper;
 
     @SuppressWarnings("unchecked")
-    protected ReactiveAdapterOperations(R repository, ObjectMapper mapper, Function<D, E> toEntityFn) {
+    protected ReactiveAdapterOperations(final R repository, final ObjectMapper mapper, final Function<D, E> toEntityFn) {
         this.repository = repository;
         this.mapper = mapper;
-        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        this.dataClass = (Class<D>) genericSuperclass.getActualTypeArguments()[1];
+        final ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+        dataClass = (Class<D>) genericSuperclass.getActualTypeArguments()[1];
         this.toEntityFn = toEntityFn;
     }
 
-    protected D toData(E entity) {
-        return mapper.map(entity, dataClass);
+    protected D toData(final E entity) {
+        return this.mapper.map(entity, this.dataClass);
     }
 
-    protected E toEntity(D data) {
-        return data != null ? toEntityFn.apply(data) : null;
+    protected E toEntity(final D data) {
+        return null != data ? this.toEntityFn.apply(data) : null;
     }
 
-    public Mono<E> save(E entity) {
-        return saveData(toData(entity))
+    public Mono<E> save(final E entity) {
+        return this.saveData(this.toData(entity))
                 .map(this::toEntity);
     }
 
-    protected Flux<E> saveAllEntities(Flux<E> entities) {
-        return saveData(entities.map(this::toData))
+    protected Flux<E> saveAllEntities(final Flux<E> entities) {
+        return this.saveData(entities.map(this::toData))
                 .map(this::toEntity);
     }
 
-    protected Mono<D> saveData(D data) {
-        return repository.save(data);
+    protected Mono<D> saveData(final D data) {
+        return this.repository.save(data);
     }
 
-    protected Flux<D> saveData(Flux<D> data) {
-        return repository.saveAll(data);
+    protected Flux<D> saveData(final Flux<D> data) {
+        return this.repository.saveAll(data);
     }
 
-    public Mono<E> findById(I id) {
-        return repository.findById(id).map(this::toEntity);
+    public Mono<E> findById(final I id) {
+        return this.repository.findById(id).map(this::toEntity);
     }
 
-    public Flux<E> findByExample(E entity) {
-        return repository.findAll(Example.of(toData(entity)))
+    public Flux<E> findByExample(final E entity) {
+        return this.repository.findAll(Example.of(this.toData(entity)))
                 .map(this::toEntity);
     }
 
     public Flux<E> findAll() {
-        return repository.findAll()
+        return this.repository.findAll()
                 .map(this::toEntity);
     }
 }

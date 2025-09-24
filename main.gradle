@@ -2,9 +2,18 @@ apply plugin: 'info.solidsoft.pitest.aggregator'
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url = "https://repo.spring.io/snapshot" }
         maven { url = "https://repo.spring.io/milestone" }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/pedro00627/crediya-common")
+            credentials {
+                username = project.findProperty("gpr.user") ?: project.findProperty("githubActor") ?: System.getenv("GITHUB_ACTOR") ?: ""
+                password = project.findProperty("gpr.token") ?: project.findProperty("githubToken") ?: System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
     }
 }
 
@@ -17,29 +26,53 @@ subprojects {
     compileJava.dependsOn validateStructure
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
     }
-
 
     test {
         useJUnitPlatform()
     }
 
-    dependencies {
-        implementation 'io.projectreactor:reactor-core'
-        implementation 'io.projectreactor.addons:reactor-extra'
+    if (!project.path.contains(':model') && !project.path.contains(':usecase')) {
+        dependencies {
+            implementation 'io.projectreactor:reactor-core'
+            implementation 'io.projectreactor.addons:reactor-extra'
+            implementation "co.com.pragma:crediya-common-starter:${rootProject.ext.commonVersion}"
+            implementation "co.com.pragma:crediya-common-security:${rootProject.ext.commonVersion}"
+            implementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.ext.springBootVersion}")
 
-        testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
+            testImplementation 'io.projectreactor.tools:blockhound-junit-platform:1.0.13.RELEASE'
+            testImplementation 'io.projectreactor:reactor-test'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-        testImplementation 'io.projectreactor:reactor-test'
-        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        compileOnly "org.projectlombok:lombok:${lombokVersion}"
-        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+            compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            testCompileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            testAnnotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+        }
+    }
+
+    if (project.path.contains(':model') || project.path.contains(':usecase')) {
+        dependencies {
+            implementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.ext.springBootVersion}")
+
+            implementation 'io.projectreactor:reactor-core'
+
+            compileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            annotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            testCompileOnly "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+            testAnnotationProcessor "org.projectlombok:lombok:${rootProject.ext.lombokVersion}"
+
+            // Agregadas dependencias de test para módulos de dominio
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
+            testImplementation 'io.projectreactor:reactor-test'
+        }
     }
 
     tasks.withType(Test).configureEach {
@@ -63,7 +96,6 @@ subprojects {
         exportLineCoverage = true
         useClasspathFile = true
         timestampedReports = false
-        //mutators = ['STRONGER', 'DEFAULTS']
         fileExtensionsToFilter.addAll('xml', 'orbit')
         junit5PluginVersion = '1.2.2'
         failWhenNoMutations = false
@@ -71,8 +103,6 @@ subprojects {
     }
 
     jacocoTestReport {
-        // Se elimina la dependencia de 'pitest' para que no se ejecute en cada build.
-        // Esto hace el build más rápido y resiliente. Pitest se puede ejecutar manualmente.
         dependsOn test
         reports {
             xml.setRequired true
@@ -81,17 +111,14 @@ subprojects {
             html.setOutputLocation layout.buildDirectory.dir("reports/jacocoHtml")
         }
     }
-
 }
 
 jacoco {
-    toolVersion = "${jacocoVersion}"
+    toolVersion = "${rootProject.ext.jacocoVersion}"
     reportsDirectory.set(layout.buildDirectory.dir("reports"))
 }
 
 tasks.register('jacocoMergedReport', JacocoReport) {
-    // Se elimina la dependencia de pitestReportAggregate para que esta tarea
-    // genere únicamente el reporte de cobertura de JaCoCo.
     dependsOn = [test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
@@ -125,8 +152,7 @@ pitestReportAggregate {
             subprojects.each { subproject ->
                 def xmlReport = subproject.layout.buildDirectory.file("reports/pitest/mutations.xml").get().asFile
                 if (xmlReport.exists()) {
-                    def xmlContent = xmlReport.text
-                    xmlContent = xmlContent.replaceAll("<\\?xml[^>]*>", "")
+                    def xmlContent = xmlReport.replaceAll("<\\?xml[^>]*>", "")
                     xmlContent = xmlContent.replaceAll("</?mutations( partial=\"true\")?>", "")
                     writer.write(xmlContent.trim() + "\n")
                 }
@@ -136,6 +162,8 @@ pitestReportAggregate {
     }
 }
 
-tasks.named('wrapper') {
-    gradleVersion = '8.14.3'
+if (project == rootProject) {
+    tasks.named('wrapper') {
+        gradleVersion = '9.0.0'
+    }
 }

@@ -7,7 +7,10 @@ import co.com.pragma.r2dbc.interfaces.StatusReactiveRepository;
 import co.com.pragma.r2dbc.mapper.StatusMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Repository
 public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Status> implements StatusGateway {
@@ -15,7 +18,7 @@ public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Sta
     private final StatusReactiveRepository repository;
     private final StatusMapper statusMapper;
 
-    public StatusRepositoryAdapter(StatusReactiveRepository repository, StatusMapper statusMapper, CacheManager cacheManager, LoggerPort logger) {
+    public StatusRepositoryAdapter(final StatusReactiveRepository repository, final StatusMapper statusMapper, final CacheManager cacheManager, final LoggerPort logger) {
         super(cacheManager, logger);
         this.repository = repository;
         this.statusMapper = statusMapper;
@@ -37,36 +40,40 @@ public class StatusRepositoryAdapter extends AbstractCachedRepositoryAdapter<Sta
     }
 
     @Override
-    protected Object getEntityId(Status entity) {
+    protected Object getEntityId(final Status entity) {
         return entity.getStatusId();
     }
 
     @Override
-    protected String getEntityName(Status entity) {
+    protected String getEntityName(final Status entity) {
         return entity.getName();
     }
 
     @Override
-    protected Mono<Status> fetchByIdFromDatabase(Object id) {
-        // Asumiendo que el ID de Status es String en la base de datos
-        return repository.findById(String.valueOf(id))
-                .map(statusMapper::toDomain);
+    protected Mono<Status> fetchByIdFromDatabase(final Object id) {
+        return this.repository.findById((Integer) id)
+                .map(this.statusMapper::toDomain);
     }
 
     @Override
-    protected Mono<Status> fetchByNameFromDatabase(String name) {
-        return repository.findByName(name)
-                .map(statusMapper::toDomain);
+    protected Mono<Status> fetchByNameFromDatabase(final String name) {
+        return this.repository.findByName(name)
+                .map(this.statusMapper::toDomain);
+    }
+
+    @Override
+    public Flux<Status> findAllByIds(final Set<Integer> ids) {
+        return this.repository.findAllByStatusIdIn(ids).map(this.statusMapper::toDomain);
     }
 
     // Implementación explícita de los métodos de StatusGateway
     @Override
-    public Mono<Status> findById(Integer id) {
+    public Mono<Status> findById(final Integer id) {
         return super.findById(id);
     }
 
     @Override
-    public Mono<Status> findByName(String statusName) {
+    public Mono<Status> findByName(final String statusName) {
         return super.findByName(statusName);
     }
 }

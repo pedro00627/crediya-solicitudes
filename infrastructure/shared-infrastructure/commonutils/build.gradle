@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':model')
+    implementation "co.com.pragma:crediya-common-starter:${commonVersion}"
+    implementation 'org.springframework:spring-context'
+
+}
+

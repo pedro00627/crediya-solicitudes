@@ -16,20 +16,20 @@ public class InvalidRequestExceptionHandler implements ExceptionHandlerStrategy 
 
     private final LoggerPort logger;
 
-    public InvalidRequestExceptionHandler(LoggerPort logger) {
+    public InvalidRequestExceptionHandler(final LoggerPort logger) {
         this.logger = logger;
     }
 
     @Override
-    public boolean supports(Class<? extends Throwable> type) {
+    public boolean supports(final Class<? extends Throwable> type) {
         return InvalidRequestException.class.isAssignableFrom(type);
     }
 
     @Override
-    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        logger.info("Petición inválida para la ruta [{}]: {}", exchange.getRequest().getPath(), ex.getMessage());
-        ErrorBody body = new ErrorBody(status.value(), "Invalid Request", ex.getMessage(), null);
+    public Mono<ErrorResponseWrapper> handle(final Throwable ex, final ServerWebExchange exchange) {
+        final HttpStatus status = HttpStatus.BAD_REQUEST;
+        this.logger.info("Petición inválida para la ruta [{}]: {}", exchange.getRequest().getPath(), ex.getMessage());
+        final ErrorBody body = new ErrorBody(status.value(), "Invalid Request", ex.getMessage(), null);
         return Mono.just(new ErrorResponseWrapper(status, body));
     }
 }

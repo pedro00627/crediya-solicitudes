@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        cleanArchitectureVersion = '3.24.0'
-        springBootVersion = '3.5.4'
-        sonarVersion = '6.2.0.5505'
+        cleanArchitectureVersion = '3.26.1'
+        springBootVersion = '3.5.6'
+        sonarVersion = '6.3.1.5724'
         jacocoVersion = '0.8.13'
         pitestVersion = '1.19.0-rc.1'
         lombokVersion = '1.18.38'
@@ -11,6 +11,7 @@ buildscript {
         reactiveCommonsMapperVersion = '0.1.0'
         archunitVersion = '1.4.1'
         jjwtVersion = '0.12.6'
+        commonVersion = '0.0.61'
     }
 }
 
@@ -20,6 +21,13 @@ plugins {
     id 'info.solidsoft.pitest' version "${pitestVersion}" apply false
     id 'org.sonarqube' version "${sonarVersion}"
     id 'jacoco'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+    }
 }
 
 sonar {

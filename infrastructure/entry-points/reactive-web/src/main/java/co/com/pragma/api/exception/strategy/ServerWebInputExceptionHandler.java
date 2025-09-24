@@ -16,29 +16,29 @@ public class ServerWebInputExceptionHandler implements ExceptionHandlerStrategy 
 
     private final LoggerPort logger;
 
-    public ServerWebInputExceptionHandler(LoggerPort logger) {
+    public ServerWebInputExceptionHandler(final LoggerPort logger) {
         this.logger = logger;
     }
 
     @Override
-    public boolean supports(Class<? extends Throwable> type) {
+    public boolean supports(final Class<? extends Throwable> type) {
         return ServerWebInputException.class.isAssignableFrom(type);
     }
 
     @Override
-    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        ServerWebInputException exception = (ServerWebInputException) ex;
+    public Mono<ErrorResponseWrapper> handle(final Throwable ex, final ServerWebExchange exchange) {
+        final HttpStatus status = HttpStatus.BAD_REQUEST;
+        final ServerWebInputException exception = (ServerWebInputException) ex;
 
         // Usamos el LoggerPort inyectado. Nota: se usa .info() porque LoggerPort no define .warn()
-        logger.info("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
+        this.logger.warn("Error de entrada en la petición [{}]: {}", exchange.getRequest().getPath(), exception.getReason());
 
         String reason = "El cuerpo de la petición tiene un formato inválido.";
         if (ex.getMessage().contains("LocalDate")) {
             reason = "El formato de fecha es inválido. Por favor, use el formato 'YYYY-MM-DD'.";
         }
 
-        ErrorBody body = new ErrorBody(status.value(), "Invalid Input", reason, null);
+        final ErrorBody body = new ErrorBody(status.value(), "Invalid Input", reason, null);
         return Mono.just(new ErrorResponseWrapper(status, body));
     }
 }
