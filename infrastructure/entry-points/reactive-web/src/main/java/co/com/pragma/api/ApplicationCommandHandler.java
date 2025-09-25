@@ -1,12 +1,15 @@
 package co.com.pragma.api;
 
 import co.com.pragma.api.dto.request.ApplicationRequestRecord;
+import co.com.pragma.api.dto.request.UpdateApplicationStatusRequestRecord;
+import co.com.pragma.api.dto.response.ApplicationStatusUpdateResponseRecord;
 import co.com.pragma.api.exception.InvalidRequestException;
 import co.com.pragma.api.mapper.IApplicationRequestMapper;
 import co.com.pragma.api.mapper.IApplicationResponseHandler;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.security.api.JWTAuthenticationFilter;
 import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
+import co.com.pragma.usecase.application.UpdateApplicationStatusUseCase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 public class ApplicationCommandHandler implements IApplicationCommandApi {
 
     private final IApplicationRequestMapper requestMapper;
-    private final CreateLoanApplicationUseCase useCase;
+    private final CreateLoanApplicationUseCase createUseCase;
+    private final UpdateApplicationStatusUseCase updateStatusUseCase;
     private final IApplicationResponseHandler responseHandler;
     private final Validator validator;
     private final LoggerPort logger;
@@ -39,7 +43,7 @@ public class ApplicationCommandHandler implements IApplicationCommandApi {
                 .flatMap(tuple -> this.validateTokenEmail(tuple.getT1(), tuple.getT2()))
                 .flatMap(this::validateRequest)
                 .flatMap(this.requestMapper::toModel)
-                .flatMap(this.useCase::createLoanApplication) // 1. Se llama al caso de uso
+                .flatMap(this.createUseCase::createLoanApplication) // 1. Se llama al caso de uso
                 .switchIfEmpty(Mono.defer(() -> { // 2. Se maneja el caso en que el Mono del caso de uso esté vacío
                     final String errorMessage = "El caso de uso no produjo ningún resultado (Mono vacío).";
                     this.logger.error(errorMessage, new IllegalStateException(errorMessage));
@@ -79,5 +83,65 @@ public class ApplicationCommandHandler implements IApplicationCommandApi {
                 .collect(Collectors.joining(", "));
         this.logger.warn("La solicitud para {} contiene datos inválidos. Violaciones: {}", this.logger.maskEmail(request.email()), errors);
         return Mono.error(new InvalidRequestException(violations));
+    }
+
+    public Mono<ServerResponse> updateApplicationStatus(final ServerRequest serverRequest) {
+        final String applicationId = serverRequest.pathVariable("applicationId");
+
+        return serverRequest.bodyToMono(UpdateApplicationStatusRequestRecord.class)
+                .flatMap(this::validateStatusUpdateRequest)
+                .flatMap(request -> {
+                    try {
+                        java.util.UUID uuid = java.util.UUID.fromString(applicationId);
+                        return updateStatusUseCase.updateStatus(
+                                uuid,
+                                request.advisorId(),
+                                request.newStatus(),
+                                request.reason()
+                        );
+                    } catch (IllegalArgumentException e) {
+                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID de solicitud inválido"));
+                    }
+                })
+                .flatMap(this::buildStatusUpdateResponse)
+                .doOnNext(response -> logger.info("Estado de solicitud {} actualizado exitosamente", applicationId))
+                .doOnError(error -> logger.error("Error actualizando estado de solicitud " + applicationId, error));
+    }
+
+    private Mono<UpdateApplicationStatusRequestRecord> validateStatusUpdateRequest(final UpdateApplicationStatusRequestRecord request) {
+        final Set<ConstraintViolation<UpdateApplicationStatusRequestRecord>> violations = this.validator.validate(request);
+        if (violations.isEmpty()) {
+            return Mono.just(request);
+        }
+        final String errors = violations.stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+        this.logger.warn("La solicitud de actualización de estado contiene datos inválidos. Violaciones: {}", errors);
+        return Mono.error(new InvalidRequestException(violations));
+    }
+
+    private Mono<ServerResponse> buildStatusUpdateResponse(co.com.pragma.model.application.Application application) {
+        ApplicationStatusUpdateResponseRecord response;
+
+        if (application.isApproved()) {
+            response = ApplicationStatusUpdateResponseRecord.approved(
+                    application.getApplicationId().toString(),
+                    application.getAdvisorId(),
+                    application.getDecisionReason(),
+                    application.getAppliedInterestRate(),
+                    application.getMonthlyPayment(),
+                    application.getUpdatedAt()
+            );
+        } else {
+            response = ApplicationStatusUpdateResponseRecord.rejected(
+                    application.getApplicationId().toString(),
+                    application.getAdvisorId(),
+                    application.getDecisionReason(),
+                    application.getUpdatedAt()
+            );
+        }
+
+        return ServerResponse.ok()
+                .bodyValue(response);
     }
 }

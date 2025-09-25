@@ -237,7 +237,8 @@ class ApplicationValidatorTest {
                 12, // term
                 "test@example.com",
                 1, // statusId
-                1  // loanTypeId
+                1 // loanTypeId
+                , null, null, null, null, null, null
         );
     }
 

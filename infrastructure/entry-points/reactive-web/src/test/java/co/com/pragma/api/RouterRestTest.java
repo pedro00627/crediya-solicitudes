@@ -13,6 +13,7 @@ import co.com.pragma.model.status.Status;
 import co.com.pragma.model.user.UserRecord;
 import co.com.pragma.usecase.application.CreateLoanApplicationUseCase;
 import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
+import co.com.pragma.usecase.application.UpdateApplicationStatusUseCase;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +54,8 @@ class RouterRestTest {
     @MockitoBean
     private FindApplicationsForReviewUseCase findApplicationsForReviewUseCase;
     @MockitoBean
+    private UpdateApplicationStatusUseCase updateApplicationStatusUseCase;
+    @MockitoBean
     private IApplicationRequestMapper requestMapper;
     @MockitoBean
     private IApplicationResponseHandler responseHandler;
@@ -80,7 +83,7 @@ class RouterRestTest {
                 "LIBRE INVERSION"
         );
 
-        final var mockApplication = new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, userEmail, 1, 1);
+        final var mockApplication = new Application(UUID.randomUUID(), "", BigDecimal.TEN, 12, userEmail, 1, 1, null, null, null, null, null, null);
         final var mockLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.valueOf(0.05), true);
         final var mockStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
         final var mockUser = new UserRecord("1", "Nombre", "Apellido", LocalDate.of(1990, 1, 1), userEmail, "123456", "3001234567", 2, 50000.0);
@@ -116,7 +119,7 @@ class RouterRestTest {
 
     @Test
     void shouldGetApplicationsForReviewSuccessfully() {
-        final var mockApplication = new Application(UUID.randomUUID(), "12345", BigDecimal.valueOf(5000), 24, "review@test.com", 1, 1);
+        final var mockApplication = new Application(UUID.randomUUID(), "12345", BigDecimal.valueOf(5000), 24, "review@test.com", 1, 1, null, null, null, null, null, null);
         final var mockReviewDTO = ApplicationReviewDTO.builder()
                 .email("review@test.com")
                 .amount(BigDecimal.valueOf(5000))

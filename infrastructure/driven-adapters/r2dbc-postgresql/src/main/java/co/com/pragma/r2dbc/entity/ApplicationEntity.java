@@ -34,4 +34,22 @@ public class ApplicationEntity {
 
     @Column("id_tipo_prestamo")
     int loanTypeId;
+
+    @Column("id_asesor")
+    String advisorId;
+
+    @Column("razon_decision")
+    String decisionReason;
+
+    @Column("tasa_interes_aplicada")
+    java.math.BigDecimal appliedInterestRate;
+
+    @Column("cuota_mensual")
+    java.math.BigDecimal monthlyPayment;
+
+    @Column("fecha_creacion")
+    java.time.LocalDateTime createdAt;
+
+    @Column("fecha_actualizacion")
+    java.time.LocalDateTime updatedAt;
 }

@@ -39,6 +39,7 @@ subprojects {
 
     if (!project.path.contains(':model') && !project.path.contains(':usecase')) {
         dependencies {
+		implementation platform('software.amazon.awssdk:bom:2.33.1')
             implementation 'io.projectreactor:reactor-core'
             implementation 'io.projectreactor.addons:reactor-extra'
             implementation "co.com.pragma:crediya-common-starter:${rootProject.ext.commonVersion}"

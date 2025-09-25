@@ -79,7 +79,7 @@ class ApplicationUseCaseTest {
         );
 
         // --- Objetos de Dominio Válidos ---
-        this.applicationRequest = new Application(null, "", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1);
+        this.applicationRequest = new Application(null, "", BigDecimal.valueOf(10000), 12, "test@test.com", 1, 1, null, null, null, null, null, null);
         this.validLoanType = new LoanType(1, "LIBRE INVERSION", BigDecimal.valueOf(5000), BigDecimal.valueOf(20000), BigDecimal.valueOf(0.05), true);
         this.validUser = new UserRecord("1", "Test", "Client", LocalDate.now(), "test@test.com", "123", "300", 2, 50000.0);
         this.validStatus = new Status(1, "PENDIENTE", "Pendiente de revisión");
@@ -175,7 +175,7 @@ class ApplicationUseCaseTest {
         when(this.userGateway.findUserByEmail(anyString())).thenReturn(Mono.just(this.validUser));
         when(this.statusGateway.findById(anyInt())).thenReturn(Mono.just(this.validStatus));
         when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any())).thenReturn(Flux.empty());
-        final Application requestWithInvalidAmount = new Application(null, "", BigDecimal.valueOf(4000), 12, "test@test.com", 1, 1);
+        final Application requestWithInvalidAmount = new Application(null, "", BigDecimal.valueOf(4000), 12, "test@test.com", 1, 1, null, null, null, null, null, null);
 
         // Act
         final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(requestWithInvalidAmount);
@@ -195,7 +195,7 @@ class ApplicationUseCaseTest {
 
         // Simulamos que el repositorio encuentra una solicitud abierta para este cliente.
         when(this.applicationGateway.findOpenApplicationsByDocumentId(anyString(), any()))
-                .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1)));
+                .thenReturn(Flux.just(new Application(UUID.randomUUID(), "doc123", BigDecimal.ONE, 1, "email@test.com", 1, 1, null, null, null, null, null, null)));
 
         // Act
         final Mono<ApplicationCreationResult> result = this.applicationUseCase.createLoanApplication(this.applicationRequest);

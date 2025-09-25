@@ -1,0 +1,66 @@
+package co.com.pragma.api.exception.strategy;
+
+import co.com.pragma.api.exception.dto.ErrorBody;
+import co.com.pragma.api.exception.dto.ErrorResponseWrapper;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.timelimiter.TimeLimiterException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+/**
+ * Maneja excepciones de Resilience4j (Circuit Breaker, Rate Limiter, Time Limiter)
+ */
+@Component
+public class ResilienceExceptionHandler implements ExceptionHandlerStrategy {
+
+    @Override
+    public boolean supports(Class<? extends Throwable> type) {
+        return CallNotPermittedException.class.isAssignableFrom(type) ||
+               RequestNotPermitted.class.isAssignableFrom(type) ||
+               TimeLimiterException.class.isAssignableFrom(type);
+    }
+
+    @Override
+    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
+        HttpStatus status;
+        String message;
+        String error;
+
+        if (ex instanceof CallNotPermittedException) {
+            // Circuit breaker abierto
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+            message = "Servicio temporalmente no disponible debido a fallos recientes. Intente nuevamente en unos minutos";
+            error = "Circuit Breaker Open";
+
+        } else if (ex instanceof RequestNotPermitted) {
+            // Rate limit excedido
+            status = HttpStatus.TOO_MANY_REQUESTS;
+            message = "Demasiadas solicitudes. Intente nuevamente más tarde";
+            error = "Rate Limit Exceeded";
+
+        } else if (ex instanceof TimeLimiterException) {
+            // Timeout configurado por Time Limiter
+            status = HttpStatus.GATEWAY_TIMEOUT;
+            message = "La operación tardó demasiado en completarse";
+            error = "Operation Timeout";
+
+        } else {
+            // Otros errores de resilience4j
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+            message = "Servicio temporalmente no disponible";
+            error = "Resilience Error";
+        }
+
+        ErrorBody errorBody = new ErrorBody(
+                status.value(),
+                error,
+                message,
+                null
+        );
+
+        return Mono.just(new ErrorResponseWrapper(status, errorBody));
+    }
+}

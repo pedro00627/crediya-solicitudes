@@ -2,6 +2,7 @@ package co.com.pragma.config;
 
 import co.com.pragma.model.application.gateways.ApplicationGateway;
 import co.com.pragma.model.config.AppRules;
+import co.com.pragma.model.gateways.NotificationGateway;
 import co.com.pragma.model.loantype.gateways.LoanTypeGateway;
 import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.model.status.gateways.StatusGateway;
@@ -71,6 +72,11 @@ class UseCasesConfigTest {
         @Primary
         public AppRules appRules() {
             return Mockito.mock(AppRules.class);
+        }
+
+        @Bean
+        public NotificationGateway notificationGateway() {
+            return Mockito.mock(NotificationGateway.class);
         }
     }
 }

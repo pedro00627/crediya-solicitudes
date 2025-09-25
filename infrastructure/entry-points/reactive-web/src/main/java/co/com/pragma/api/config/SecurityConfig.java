@@ -4,6 +4,7 @@ import co.com.pragma.model.log.gateways.LoggerPort;
 import co.com.pragma.security.api.JWTAuthenticationFilter;
 import co.com.pragma.security.api.config.CommonSecurityConfig;
 import co.com.pragma.security.api.config.SecurityFilterChainBuilder;
+import co.com.pragma.security.config.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.authorization.HttpStatusServerAccessDeniedHandler;
@@ -26,7 +25,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-@EnableConfigurationProperties({SecurityProperties.class, SecurityRulesProperties.class})
+@EnableConfigurationProperties(SecurityRulesProperties.class)
 @Import(CommonSecurityConfig.class)
 public class SecurityConfig {
 
@@ -77,8 +76,4 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

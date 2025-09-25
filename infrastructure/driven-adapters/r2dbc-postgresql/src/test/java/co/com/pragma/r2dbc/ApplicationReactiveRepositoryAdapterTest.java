@@ -40,7 +40,7 @@ class ApplicationReactiveRepositoryAdapterTest {
     void setUp() {
         // Arrange: Datos de prueba consistentes
         final UUID id = UUID.randomUUID();
-        this.applicationModel = new Application(id, "", BigDecimal.TEN, 12, "test@test.com", 1, 1);
+        this.applicationModel = new Application(id, "", BigDecimal.TEN, 12, "test@test.com", 1, 1, null, null, null, null, null, null);
 
         // El objeto de entidad ahora es un reflejo realista del modelo
         this.applicationEntity = new ApplicationEntity();

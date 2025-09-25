@@ -34,3 +34,7 @@ project(':rest-consumer').projectDir = file('./infrastructure/driven-adapters/re
 
 include ':commonutils'
 project(':commonutils').projectDir = file('./infrastructure/shared-infrastructure/commonutils')
+include ':metrics'
+project(':metrics').projectDir = file('./infrastructure/helpers/metrics')
+include ':sqs-sender'
+project(':sqs-sender').projectDir = file('./infrastructure/driven-adapters/sqs-sender')

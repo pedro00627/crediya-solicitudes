@@ -1,0 +1,70 @@
+package co.com.pragma.api.exception.strategy;
+
+import co.com.pragma.api.exception.dto.ErrorBody;
+import co.com.pragma.api.exception.dto.ErrorResponseWrapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.exception.SdkException;
+
+/**
+ * Maneja excepciones específicas de servicios AWS (SQS, SNS, SES, etc.)
+ */
+@Component
+public class AwsServiceExceptionHandler implements ExceptionHandlerStrategy {
+
+    @Override
+    public boolean supports(Class<? extends Throwable> type) {
+        return AwsServiceException.class.isAssignableFrom(type) ||
+               SdkClientException.class.isAssignableFrom(type) ||
+               SdkException.class.isAssignableFrom(type);
+    }
+
+    @Override
+    public Mono<ErrorResponseWrapper> handle(Throwable ex, ServerWebExchange exchange) {
+        HttpStatus status;
+        String message;
+        String error;
+
+        if (ex instanceof AwsServiceException awsEx) {
+            // Error específico del servicio AWS
+            if (awsEx.statusCode() >= 500) {
+                status = HttpStatus.SERVICE_UNAVAILABLE;
+                message = "Servicio de notificaciones temporalmente no disponible";
+                error = "AWS Service Error";
+            } else if (awsEx.statusCode() >= 400) {
+                status = HttpStatus.BAD_GATEWAY;
+                message = "Error de configuración en el servicio de notificaciones";
+                error = "AWS Configuration Error";
+            } else {
+                status = HttpStatus.SERVICE_UNAVAILABLE;
+                message = "Error en servicio de notificaciones AWS";
+                error = "AWS Service Error";
+            }
+
+        } else if (ex instanceof SdkClientException) {
+            // Error de cliente SDK (configuración, credenciales, etc.)
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+            message = "Error de configuración del servicio de notificaciones";
+            error = "AWS Client Configuration Error";
+
+        } else {
+            // Otros errores del SDK de AWS
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+            message = "Error temporal en servicio de notificaciones";
+            error = "AWS Service Error";
+        }
+
+        ErrorBody errorBody = new ErrorBody(
+                status.value(),
+                error,
+                message,
+                null
+        );
+
+        return Mono.just(new ErrorResponseWrapper(status, errorBody));
+    }
+}

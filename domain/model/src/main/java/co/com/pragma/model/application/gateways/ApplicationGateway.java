@@ -6,9 +6,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ApplicationGateway {
     Mono<Application> save(Application application);
+
+    Mono<Application> findById(UUID applicationId);
 
     Flux<Application> findOpenApplicationsByDocumentId(String documentId, List<Integer> statusIds);
 

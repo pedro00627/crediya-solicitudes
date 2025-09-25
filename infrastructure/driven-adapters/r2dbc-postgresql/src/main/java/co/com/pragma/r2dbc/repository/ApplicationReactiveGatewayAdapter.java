@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class ApplicationReactiveGatewayAdapter extends ReactiveAdapterOperations<
@@ -23,6 +24,12 @@ public class ApplicationReactiveGatewayAdapter extends ReactiveAdapterOperations
         > implements ApplicationGateway {
     public ApplicationReactiveGatewayAdapter(final ApplicationReactiveRepository repository, final ObjectMapper mapper) {
         super(repository, mapper, d -> mapper.map(d, Application.class));
+    }
+
+    @Override
+    public Mono<Application> findById(final UUID applicationId) {
+        return this.repository.findById(applicationId.toString())
+                .map(this::toEntity);
     }
 
     @Override

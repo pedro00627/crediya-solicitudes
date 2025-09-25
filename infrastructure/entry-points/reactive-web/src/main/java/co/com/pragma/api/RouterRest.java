@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -20,13 +21,15 @@ public class RouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(path = "/api/v1/solicitud", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST, beanClass = ApplicationCommandHandler.class, beanMethod = "createLoanApplication"),
-            @RouterOperation(path = "/api/v1/solicitud", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET, beanClass = ApplicationQueryHandler.class, beanMethod = "getApplicationsForReview")
+            @RouterOperation(path = "/api/v1/solicitud", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET, beanClass = ApplicationQueryHandler.class, beanMethod = "getApplicationsForReview"),
+            @RouterOperation(path = "/api/v1/solicitud/{applicationId}/status", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT, beanClass = ApplicationCommandHandler.class, beanMethod = "updateApplicationStatus")
     })
     public RouterFunction<ServerResponse> routerFunction(final ApplicationCommandHandler commandHandler, final ApplicationQueryHandler queryHandler) {
         return route().nest(
                 path("/api/v1/solicitud"), builder -> builder
                         .route(POST("").and(accept(MediaType.APPLICATION_JSON)), commandHandler::createLoanApplication)
                         .route(GET("").and(accept(MediaType.APPLICATION_JSON)), queryHandler::getApplicationsForReview)
+                        .route(PUT("/{applicationId}/status").and(accept(MediaType.APPLICATION_JSON)), commandHandler::updateApplicationStatus)
         ).build();
     }
 }

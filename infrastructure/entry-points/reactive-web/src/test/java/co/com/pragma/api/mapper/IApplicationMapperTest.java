@@ -231,7 +231,7 @@ class IApplicationMapperTest {
     }
 
     static Stream<Arguments> provideReviewDTOInputs() {
-        final Application app = new Application(UUID.randomUUID(), "12345", new BigDecimal("1000000"), 12, "test@test.com", 1, 1);
+        final Application app = new Application(UUID.randomUUID(), "12345", new BigDecimal("1000000"), 12, "test@test.com", 1, 1, null, null ,null ,null ,null, null);
         final LoanType loan = new LoanType(1, "TEST", new BigDecimal("1000"), new BigDecimal("10000"), new BigDecimal("0.15"), true);
 
         return Stream.of(
@@ -271,8 +271,9 @@ class IApplicationMapperTest {
                 24,
                 "test@example.com",
                 1,
-                1
-        );
+                1,
+                null, null,null,null,null,null
+                );
     }
 
     private LoanType createTestLoanType() {

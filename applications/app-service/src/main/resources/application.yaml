@@ -1,42 +1,31 @@
 server:
-  port: 8081 # Puerto asignado para Solicitudes
+  port: 8081
 spring:
   application:
     name: "Solicitudes"
-
-  # --- Configuración de Base de Datos Estándar de Spring Boot ---
-  # Spring Boot usará esta sección para auto-configurar la conexión.
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/crediya
-    username: ${DB_USER}
-    password: ${DB_SECRET}
+    url: "r2dbc:postgresql://localhost:5432/crediya"
+    username: "${DB_USER}"
+    password: "${DB_SECRET}"
     properties:
-      schema: solicitudes
+      schema: "solicitudes"
     pool:
       enabled: true
       initial-size: 5
       max-size: 10
-      max-idle-time: 30m
-      connect-timeout: 5s
-
-  # Conexión JDBC para migraciones (Flyway/Liquibase)
-  #datasource:
-  #  url: jdbc:postgresql://localhost:5432/crediya
-  #  username: ${DB_USER}
-  #  password: ${DB_SECRET}
-
+      max-idle-time: "30m"
+      connect-timeout: "5s"
   devtools:
     add-properties: false
-
   profiles:
     include: null
   cache:
-    type: caffeine
+    type: "caffeine"
     cache-names:
-      - statuses
-      - loan_types
+    - "statuses"
+    - "loan_types"
     caffeine:
-      spec: maximumSize=500,expireAfterAccess=500s
+      spec: "maximumSize=500,expireAfterAccess=500s"
 management:
   endpoints:
     web:
@@ -51,23 +40,20 @@ management:
       enabled: true
   tracing:
     sampling:
-      probability: 1.0 # Captura el 100% de las trazas en desarrollo
-
+      probability: 1.0
 logging:
   level:
-    root: info
-    co.com.pragma: debug
-    org.springframework.security: debug
-    reactor.core: debug
-    org.springframework.web.server: debug
-
+    root: "info"
+    co.com.pragma: "debug"
+    org.springframework.security: "debug"
+    reactor.core: "debug"
+    org.springframework.web.server: "debug"
 adapters:
   restconsumer:
     url: "http://localhost:8080/api/v1/usuarios"
   user-api:
     timeout: 5000
     url: "http://localhost:8080"
-
 resilience4j:
   circuitbreaker:
     instances:
@@ -89,41 +75,52 @@ resilience4j:
         slidingWindowSize: 10
         minimumNumberOfCalls: 10
         waitDurationInOpenState: "10s"
-
-# Propiedades de negocio externalizadas
 app:
   rules:
-    client-role-id: 3
+    client-role-id: 1
     pending-status-id: 1
-    terminal-status-ids: [ 2, 3, 4 ] # 2=APROBADO, 3=RECHAZADO, 4=CANCELADO
-
+    terminal-status-ids:
+    - 2
+    - 3
+    - 4
 jwt:
-  secret: ${JWT_SECRET}
-  expiration: 3600000 # 1 hour in milliseconds
+  secret: "${JWT_SECRET}"
+  expiration: 3600000
   excluded-paths:
-    - /swagger-ui.html
-    - /swagger-ui/**
-    - /webjars/**
-    - /v3/api-docs/**
-    - /actuator/**
-
+  - "/swagger-ui.html"
+  - "/swagger-ui/**"
+  - "/webjars/**"
+  - "/v3/api-docs/**"
+  - "/actuator/**"
 security:
   rules:
     authorization:
-      - path: /swagger-ui.html
-        roles: [ ROLE_ANONYMOUS ]
-      - path: /swagger-ui/**
-        roles: [ ROLE_ANONYMOUS ]
-      - path: /webjars/**
-        roles: [ ROLE_ANONYMOUS ]
-      - path: /v3/api-docs/**
-        roles: [ ROLE_ANONYMOUS ]
-      - path: /actuator/**
-        roles: [ ROLE_ANONYMOUS ]
-      - path: /api/v1/solicitud
-        method: POST
-        managerBeanName: postSolicitudCreationAuthorizationManager
-        roles: [ CLIENT ]
-      - path: /api/v1/solicitud
-        method: GET
-        roles: [ ADVISOR ]
+    - path: "/swagger-ui.html"
+      roles:
+      - "ROLE_ANONYMOUS"
+    - path: "/swagger-ui/**"
+      roles:
+      - "ROLE_ANONYMOUS"
+    - path: "/webjars/**"
+      roles:
+      - "ROLE_ANONYMOUS"
+    - path: "/v3/api-docs/**"
+      roles:
+      - "ROLE_ANONYMOUS"
+    - path: "/actuator/**"
+      roles:
+      - "ROLE_ANONYMOUS"
+    - path: "/api/v1/solicitud"
+      method: "POST"
+      managerBeanName: "postSolicitudCreationAuthorizationManager"
+      roles:
+      - "CLIENT"
+    - path: "/api/v1/solicitud"
+      method: "GET"
+      roles:
+      - "ADVISOR"
+adapter:
+  sqs:
+    region: "${AWS_REGION:us-east-2}"
+    queueUrl: "${APPLICATION_STATUS_QUEUE_URL:https://sqs.us-east-2.amazonaws.com/772390956893/crediya-application-status-queue}"
+    endpoint: "${AWS_SQS_ENDPOINT:}"

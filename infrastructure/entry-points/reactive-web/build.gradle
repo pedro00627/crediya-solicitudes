@@ -10,8 +10,13 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
+    // Dependencies for exception handling strategies
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc' // For DataAccessResourceFailureException
+    implementation 'org.springframework:spring-tx' // For TransactionException
+
     // Dependencia a la librería common-logging
     implementation "co.com.pragma:crediya-common-starter:${commonVersion}"
+    implementation "co.com.pragma:crediya-common-security:${commonVersion}"
     // Dependencia para tests de Spring Security
     testImplementation 'org.springframework.security:spring-security-test'
 }

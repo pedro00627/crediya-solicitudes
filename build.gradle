@@ -11,7 +11,9 @@ buildscript {
         reactiveCommonsMapperVersion = '0.1.0'
         archunitVersion = '1.4.1'
         jjwtVersion = '0.12.6'
-        commonVersion = '0.0.61'
+        commonVersion = '0.0.63'
+        awsVersion = '2.29.35'
+        resilience4jVersion = '2.2.0'
     }
 }
 
@@ -27,6 +29,8 @@ plugins {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        mavenBom "software.amazon.awssdk:bom:2.29.35"
+        mavenBom "io.github.resilience4j:resilience4j-bom:2.2.0"
     }
 }
 

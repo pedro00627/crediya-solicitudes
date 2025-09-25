@@ -17,6 +17,7 @@ import co.com.pragma.model.validation.ValidationData;
 import co.com.pragma.usecase.validator.ApplicationValidator;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class ApplicationUseCase implements CreateLoanApplicationUseCase {
@@ -127,15 +128,16 @@ public class ApplicationUseCase implements CreateLoanApplicationUseCase {
     private Mono<ApplicationCreationResult> saveApplicationAndBuildResult(final Application applicationRequest, final ValidationData data, final Status defaultStatus) {
         this.logger.debug("Paso 3 - saveApplicationAndBuildResult. Request original: statusId={}, loanTypeId={}. Estado por defecto a usar: statusId={}",
                 applicationRequest.getStatusId(), applicationRequest.getLoanTypeId(), defaultStatus.getStatusId());
-        final Application applicationToSave = new Application(
-                null,
-                data.user().getIdentityDocument(),
-                applicationRequest.getAmount(),
-                applicationRequest.getTerm(),
-                applicationRequest.getEmail(),
-                defaultStatus.getStatusId(),
-                data.loanType().getLoanTypeId()
-        );
+        final Application applicationToSave = Application.builder()
+                .applicationId(null)
+                .documentId(data.user().getIdentityDocument())
+                .amount(applicationRequest.getAmount())
+                .term(applicationRequest.getTerm())
+                .email(applicationRequest.getEmail())
+                .statusId(defaultStatus.getStatusId())
+                .loanTypeId(data.loanType().getLoanTypeId())
+                .createdAt(LocalDateTime.now())
+                .build();
 
         return this.applicationGateway.save(applicationToSave)
                 .map(savedApplication -> new ApplicationCreationResult(savedApplication, data.loanType(), defaultStatus, data.user()));
