@@ -29,6 +29,7 @@ public interface IApplicationMapper {
     @Mapping(target = "loanTypeId", ignore = true)
     Application toApplication(ApplicationRequestRecord requestRecord);
 
+    @Mapping(source = "application.applicationId", target = "applicationId") // Añadido para mapear el ID
     @Mapping(source = "application.amount", target = "amount")
     @Mapping(source = "application.term", target = "term")
     @Mapping(source = "application.email", target = "email")

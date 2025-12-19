@@ -15,6 +15,7 @@ import java.util.List;
 public class FindApplicationsForReviewUseCaseImpl implements FindApplicationsForReviewUseCase {
 
     private static final List<String> REVIEW_STATUSES = List.of(
+            ApplicationStatus.PENDING,
             ApplicationStatus.PENDING_REVIEW,
             ApplicationStatus.REJECTED,
             ApplicationStatus.MANUAL_REVIEW

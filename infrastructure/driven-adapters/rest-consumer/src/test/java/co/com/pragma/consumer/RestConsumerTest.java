@@ -47,6 +47,44 @@ class RestConsumerTest {
     }
 
     @Test
+    @DisplayName("Debe encontrar un usuario por email con símbolo + exitosamente")
+    void shouldFindUserByEmailWithPlusSymbol() throws JsonProcessingException {
+        // Arrange: Email con símbolo + que debe ser codificado correctamente
+        final String email = "test+tag@pragma.com.co";
+        final UserRecord mockUser = new UserRecord(
+                "1",
+                "Nombre",
+                "Apellido",
+                LocalDate.of(1990, 1, 1),
+                email,
+                "123456",
+                "3001234567",
+                2,
+                50000.0
+        );
+        final String jsonResponse = RestConsumerTest.objectMapper.writeValueAsString(mockUser);
+
+        RestConsumerTest.mockBackEnd.enqueue(new MockResponse()
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setResponseCode(HttpStatus.OK.value())
+                .setBody(jsonResponse));
+
+        // Act: Llamamos al método que queremos probar
+        final var response = RestConsumerTest.restConsumer.findUserByEmail(email);
+
+        // Assert: Verificamos que la respuesta es la esperada
+        StepVerifier.create(response)
+                .expectNextMatches(user -> {
+                    assertAll(
+                            () -> assertEquals(email, user.getEmail(), "El email con + no coincide"),
+                            () -> assertEquals(2, user.getRoleId(), "El ID del rol no coincide")
+                    );
+                    return true;
+                })
+                .verifyComplete();
+    }
+
+    @Test
     @DisplayName("Debe encontrar un usuario por email exitosamente")
     void shouldFindUserByEmail() throws JsonProcessingException {
         // Arrange: Preparamos la respuesta que el servidor mock debe devolver

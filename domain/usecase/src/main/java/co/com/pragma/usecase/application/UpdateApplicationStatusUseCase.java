@@ -29,13 +29,12 @@ public class UpdateApplicationStatusUseCase {
 
     public Mono<Application> updateStatus(UUID applicationId, String advisorId, String newStatus, String reason) {
         return updateStatusTransactional(applicationId, advisorId, newStatus, reason)
-                .flatMap(result -> {
-                    // Enviar notificaciones DESPUÉS de la transacción exitosa
-                    return sendNotification(result.originalApp(), result.updatedApp(), advisorId, reason)
-                            .doOnError(error -> logger.warn("Notification failed but status was updated successfully", error))
-                            .onErrorResume(error -> Mono.just("NOTIFICATION_FAILED"))
-                            .thenReturn(result.updatedApp());
-                })
+                .flatMap(result ->
+                    sendNotification(result.originalApp(), result.updatedApp(), advisorId, reason)
+                        .doOnSuccess(messageId -> logger.info("Successfully queued notification with messageId: {}", messageId))
+                        .doOnError(error -> logger.error("Failed to queue notification for application {}. Rolling back transaction.", error))
+                        .thenReturn(result.updatedApp()) // Si la notificación es exitosa, se pasa la aplicación actualizada.
+                )
                 .doOnNext(app -> logger.info("Estado de solicitud {} actualizado a {} por asesor {}",
                         applicationId, newStatus, advisorId))
                 .doOnError(error -> logger.error("Error actualizando estado de solicitud " + applicationId, error));
@@ -101,26 +100,23 @@ public class UpdateApplicationStatusUseCase {
 
     private Mono<String> sendNotification(Application originalApplication, Application updatedApplication,
                                         String advisorId, String reason) {
+        // Este método ahora se enfoca solo en construir y enviar.
+        // El manejo de errores se hace en el suscriptor.
         return buildNotificationData(originalApplication, updatedApplication, advisorId, reason)
-                .flatMap(notificationGateway::sendApplicationStatusChange)
-                .doOnSuccess(messageId -> logger.info("Notification sent successfully: {}", messageId))
-                .doOnError(error -> logger.error("Failed to send notification for application: " + updatedApplication.getApplicationId(), error))
-                .onErrorResume(error -> {
-                    // No fallar la transacción si no se puede enviar la notificación
-                    logger.warn("Notification failed but continuing with status update: {}", error.getMessage());
-                    return Mono.just("NOTIFICATION_FAILED");
-                });
+                .flatMap(notificationGateway::sendApplicationStatusChange);
     }
 
     private Mono<ApplicationStatusEvent> buildNotificationData(Application originalApp, Application updatedApp,
                                                              String advisorId, String reason) {
+        // Se añade validación para asegurar que los datos necesarios para la notificación existan.
         return userGateway.findUserByEmail(updatedApp.getEmail())
+                .switchIfEmpty(Mono.error(() -> new BusinessException("Notification failed: User not found for email " + updatedApp.getEmail())))
                 .flatMap(user -> {
                     // Consultas cacheadas (rápidas)
                     return Mono.zip(
-                            statusGateway.findById(originalApp.getStatusId()),    // Estado anterior
-                            statusGateway.findById(updatedApp.getStatusId()),     // Estado nuevo
-                            loanTypeGateway.findById(updatedApp.getLoanTypeId()), // Tipo de préstamo
+                            statusGateway.findById(originalApp.getStatusId()).switchIfEmpty(Mono.error(() -> new BusinessException("Notification failed: Previous status not found"))),
+                            statusGateway.findById(updatedApp.getStatusId()).switchIfEmpty(Mono.error(() -> new BusinessException("Notification failed: New status not found"))),
+                            loanTypeGateway.findById(updatedApp.getLoanTypeId()).switchIfEmpty(Mono.error(() -> new BusinessException("Notification failed: Loan type not found"))),
                             Mono.just(user) // Usuario ya consultado
                     );
                 })

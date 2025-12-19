@@ -15,6 +15,7 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
@@ -85,6 +86,8 @@ public class ApplicationCommandHandler implements IApplicationCommandApi {
         return Mono.error(new InvalidRequestException(violations));
     }
 
+    @Override
+    @Transactional
     public Mono<ServerResponse> updateApplicationStatus(final ServerRequest serverRequest) {
         final String applicationId = serverRequest.pathVariable("applicationId");
 
@@ -105,7 +108,15 @@ public class ApplicationCommandHandler implements IApplicationCommandApi {
                 })
                 .flatMap(this::buildStatusUpdateResponse)
                 .doOnNext(response -> logger.info("Estado de solicitud {} actualizado exitosamente", applicationId))
-                .doOnError(error -> logger.error("Error actualizando estado de solicitud " + applicationId, error));
+                .doOnError(error -> logger.error("Error actualizando estado de solicitud " + applicationId, error))
+                .contextWrite(context -> {
+                    final var authHeaders = serverRequest.headers().header(JWTAuthenticationFilter.AUTH_TOKEN_KEY);
+                    if (!authHeaders.isEmpty()) {
+                        return context.put(JWTAuthenticationFilter.AUTH_TOKEN_KEY, authHeaders.getFirst());
+                    }
+                    this.logger.warn("No JWT authentication header found in request for updateApplicationStatus");
+                    return context;
+                });
     }
 
     private Mono<UpdateApplicationStatusRequestRecord> validateStatusUpdateRequest(final UpdateApplicationStatusRequestRecord request) {

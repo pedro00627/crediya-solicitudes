@@ -16,7 +16,7 @@ import java.util.UUID;
  * reactiva, permitiendo una trazabilidad completa en los logs.
  */
 @Component
-@Order(-1) // Se ejecuta antes que otros filtros para asegurar que el contexto esté disponible.
+@Order(1) // Se ejecuta después del filtro JWT para no interferir con el contexto de autenticación.
 public class TraceabilityFilter implements WebFilter {
 
     public static final String CORRELATION_ID_KEY = "correlationId";
@@ -29,8 +29,11 @@ public class TraceabilityFilter implements WebFilter {
         final String correlationId = Optional.ofNullable(exchange.getRequest().getHeaders().getFirst(TraceabilityFilter.CORRELATION_ID_HEADER))
                 .orElse(UUID.randomUUID().toString());
 
-        // Añade el ID de correlación al Contexto de Reactor y continúa la cadena de filtros.
+        // Añade el ID de correlación al Contexto de Reactor preservando el contexto existente
         return chain.filter(exchange)
-                .contextWrite(ctx -> ctx.put(TraceabilityFilter.CORRELATION_ID_KEY, correlationId));
+                .contextWrite(ctx -> {
+                    // Preservar todo el contexto existente y solo añadir/actualizar el correlationId
+                    return ctx.put(TraceabilityFilter.CORRELATION_ID_KEY, correlationId);
+                });
     }
 }

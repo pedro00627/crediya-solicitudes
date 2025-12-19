@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationReviewDTO {
+    private String applicationId;
     private BigDecimal amount;
     private Integer term;
     private String email;

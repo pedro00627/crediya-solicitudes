@@ -5,6 +5,7 @@ import co.com.pragma.api.mapper.ApplicationMapperAdapter;
 import co.com.pragma.model.common.PageRequest;
 import co.com.pragma.model.common.PagedResponse;
 import co.com.pragma.model.log.gateways.LoggerPort;
+import co.com.pragma.security.api.JWTAuthenticationFilter;
 import co.com.pragma.usecase.application.FindApplicationsForReviewUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -45,6 +46,14 @@ public class ApplicationQueryHandler implements IApplicationQueryApi {
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(pagedResponse);
                             });
+                })
+                .contextWrite(context -> {
+                    final var authHeaders = serverRequest.headers().header(JWTAuthenticationFilter.AUTH_TOKEN_KEY);
+                    if (!authHeaders.isEmpty()) {
+                        return context.put(JWTAuthenticationFilter.AUTH_TOKEN_KEY, authHeaders.getFirst());
+                    }
+                    this.logger.warn("No JWT authentication header found in request for getApplicationsForReview");
+                    return context;
                 });
     }
 
